@@ -1,0 +1,402 @@
+<template>
+  <div class="CS-Todo">
+    <div class="header">
+      <div class="width-wrapper">
+        <span class="title">
+          Todo-list
+        </span>
+        <span class="todo-input">
+          <input
+            v-model="todoInputingValue"
+            type="text"
+            placeholder="添加todo"
+            autocomplete="off"
+            @keydown="onTodoInputKeydown"
+          />
+        </span>
+        <span class="todo-input-right-space"></span>
+      </div>
+    </div>
+    <div class="width-wrapper">
+      <div class="todo-list-box">
+        <div class="title">
+          正在进行
+        </div>
+
+        <transition-group class="todo-list" v-if="todoList.length > 0" name="todo-list" tag="ul">
+          <li class="items todo-list-item" v-for="(item, index) in todoList" :key="item.id">
+            <span class="check">
+              <input
+                type="checkbox"
+                v-model="item.hasDone"
+                @change="onTodoListItemCheckChange(item, index)"
+              />
+            </span>
+            <div class="content" v-show="!item.isEdit" @click="onItemClick(item)">
+              <span>{{ item.content }}</span>
+            </div>
+            <input
+              :ref="item.id"
+              class="edit-content"
+              type="text"
+              v-model="item.content"
+              v-show="item.isEdit"
+              @blur="onItemInputBlur(item)"
+            />
+            <div class="collection">
+              <span class="time" title="创建日期">{{
+                formatDate(new Date(item.createTime), "yy-MM-dd hh:mm")
+              }}</span>
+              <span class="operations">
+                <span title="置顶"><svg-icon class="icons" icon-class="top"/></span>
+                <span title="长期事项"><svg-icon class="icons" icon-class="timer"/></span>
+                <span title="删除"
+                  ><svg-icon
+                    class="icons"
+                    icon-class="delete"
+                    @click="delItem(item, index, 'todoList', true)"
+                /></span>
+              </span>
+            </div>
+          </li>
+        </transition-group>
+      </div>
+
+      <div class="done-list-box">
+        <div class="title">
+          已完成
+        </div>
+
+        <transition-group class="done-list" v-if="doneList.length > 0" name="done-list" tag="ul">
+          <li class="items done-list-item" v-for="(item, index) in doneList" :key="item.id">
+            <span class="check">
+              <input
+                type="checkbox"
+                v-model="item.hasDone"
+                @change="onDoneListItemCheckChange(item, index)"
+              />
+            </span>
+            <div class="content">
+              <span>{{ item.content }}</span>
+            </div>
+            <div class="collection">
+              <span class="time" title="删除日期">{{
+                formatDate(new Date(item.doneTime), "yy-MM-dd hh:mm")
+              }}</span>
+              <span class="operations">
+                <span title="删除"
+                  ><svg-icon
+                    class="icons"
+                    icon-class="delete"
+                    @click="delItem(item, index, 'doneList', false)"
+                /></span>
+              </span>
+            </div>
+          </li>
+        </transition-group>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import util from "@/utils/util";
+
+export default {
+  name: "CS-Todo",
+  data() {
+    return {
+      todoInputingValue: "",
+      todoList: [],
+      longTodoList: [],
+      doneList: [],
+      delList: [] // 已经删除的项
+    };
+  },
+  watch: {
+    /**
+     * list发生变化时也记录在本地(需要deep监听)
+     */
+    todoList: {
+      handler: function(val, oldVal) {
+        localStorage.setItem("todoList", JSON.stringify(val));
+      },
+      deep: true
+    },
+    doneList: {
+      handler: function(val, oldVal) {
+        localStorage.setItem("doneList", JSON.stringify(val));
+      },
+      deep: true
+    },
+    longTodoList: {
+      handler: function(val, oldVal) {
+        localStorage.setItem("longTodoList", JSON.stringify(val));
+      },
+      deep: true
+    },
+    delList: {
+      handler: function(val, oldVal) {
+        localStorage.setItem("delList", JSON.stringify(val));
+      },
+      deep: true
+    }
+  },
+  created() {
+    this.recoverData("todoList");
+    this.recoverData("doneList");
+    this.recoverData("longTodoList");
+    this.recoverData("delList");
+  },
+  methods: {
+    formatDate(date, format) {
+      return util.formatDate(date, format);
+    },
+    /**
+     * 从本地恢复数据
+     */
+    recoverData(listName) {
+      let list = JSON.parse(localStorage.getItem(listName));
+      if (list && Object.prototype.toString.call(list) === "[object Array]") {
+        this[listName] = [...list];
+      } else {
+        this[listName] = [];
+      }
+    },
+    /**
+     * @event
+     */
+    onTodoInputKeydown(e) {
+      // console.log(e);
+      if (e.keyCode === 13) {
+        // 按下回车键
+        this.add(e);
+      }
+    },
+    /**
+     * 新增
+     */
+    add(evt) {
+      if (evt.target.value && evt.target.value.trim() != "") {
+        let o = {
+          content: evt.target.value.trim(),
+          id: "_000_" + new Date().getTime() + "_" + Math.round(Math.random() * 10000),
+          hasDone: false, // 是否完成
+          hasDel: false, // 是否删除
+          isEdit: false, // 是否编辑状态
+          isTop: false, // 是否置顶
+          createTime: new Date().getTime(),
+          doneTime: -1,
+          delTime: -1
+        };
+
+        this.todoList.unshift(o);
+        this.todoInputingValue = "";
+      }
+    },
+    /**
+     * item点击时
+     */
+    onItemClick(item) {
+      item.isEdit = true;
+      // console.log("this.$refs[item.id]: ", this.$refs[item.id][0]);
+
+      this.$nextTick(() => {
+        this.$refs[item.id][0].focus();
+      });
+    },
+    /**
+     * 编辑项blur时
+     */
+    onItemInputBlur(item) {
+      item.isEdit = false;
+    },
+    /**
+     * todolist CheckBox变化时
+     */
+    onTodoListItemCheckChange(item, index) {
+      if (item.hasDone === false) return;
+
+      item.doneTime = new Date().getTime();
+      let tmp = this.todoList.splice(index, 1)[0];
+      this.doneList.unshift(tmp);
+    },
+    /**
+     * donelist CheckBox变化时
+     */
+    onDoneListItemCheckChange(item, index) {
+      if (item.hasDone === true) return;
+
+      let tmp = this.doneList.splice(index, 1)[0];
+      this.todoList.unshift(tmp);
+    },
+    /**
+     * 删除
+     * @param {String} listName 列表名
+     * @param {Boolean} flag 是否需要弹窗确认
+     */
+    delItem(item, index, listName, flag) {
+      this[listName].splice(index, 1);
+      // if (flag) {
+      //   let cf = confirm(`确认要删除【${item.content}】吗？`);
+      //   if (cf) {
+      //     this[listName].splice(index, 1);
+      //   }
+      // } else {
+      //   this[listName].splice(index, 1);
+      // }
+    }
+  }
+};
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped lang="stylus">
+$content-width = 1200px;
+$header-height = 50px;
+$borderRadius = 6px;
+$bgColor1 = #abc;
+$textColor = #000;
+
+// shuffle和排序的过渡动画只需要这个类设置
+.todo-list-item, .done-list-item {
+  transition: all .5s;
+}
+// 下面是add和del的动画
+.todo-list-enter-active, .todo-list-leave-active {
+  transition: all .5s ease;
+
+}
+.todo-list-enter, .todo-list-leave-to {
+  transform: translate3d(-1000px, 0, 0);
+  opacity: 0.3;
+}
+.todo-list-leave-to {
+  // position: absolute !important;
+  // width: 100px !important;
+}
+
+.done-list-enter-active, .done-list-leave-active {
+  transition: all .5s ease;
+}
+.done-list-enter, .done-list-leave-to {
+  transform: translate3d(1000px, 0, 0);
+  opacity: 0.3;
+}
+
+.CS-Todo
+  font-family: 'Microsoft YaHei';
+  font-size: 12px;
+  background: #efefef;
+  height 100vh;
+  width: 100vw;
+  overflow-y: auto;
+  overflow-x: hidden;
+  ul
+    list-style none;
+  .width-wrapper
+    width:$content-width;
+    display block;
+    margin: 0 auto;
+  .header
+    position relative;
+    width 100%;
+    background $bgColor1;
+    height $header-height;
+    line-height $header-height;
+    text-align center;
+    .title, .todo-input, .todo-input-right-space
+      display inline-block;
+      margin:0;
+      width: 33%;
+    .title
+      font-size 30px;
+      font-weight 700;
+      color: #507f96;
+      text-shadow: 3px 2px 4px #efefef;
+      // text-align left;
+    .todo-input
+      margin: 0 auto;
+      height $header-height;
+      line-height $header-height;
+      vertical-align top;
+      input
+        padding: 0 10px;
+        border: 1px solid #ccc;
+        height 30px;
+        width: 100%;
+        border-radius $borderRadius;
+        font-family: 'Microsoft YaHei';
+        letter-spacing: 0.6px;
+        font-size: 12px;
+  .todo-list-box, .done-list-box
+    display inline-block;
+    width: 45%;
+    margin: 20px;
+    vertical-align top;
+    .title
+      margin-top: 10px;
+      font-size:16px;
+      font-weight 700;
+    .todo-list,.done-list
+      .items
+        position relative;
+        margin: 15px auto;
+        padding-top: 3px;
+        width: 100%;
+        min-height 40px;
+        line-height 30px;
+        font-size: 13px;
+        background: #fff;
+        color: $textColor;
+        border-radius $borderRadius;
+        &:hover
+          .operations
+            opacity 1!important;
+        .check
+          input
+            width: 18px;
+            height: 18px;
+            margin: 0 10px;
+            vertical-align: middle;
+            cursor pointer
+        div.content
+          display inline-block;
+          width: 90%;
+          letter-spacing: 0.6px;
+          cursor pointer;
+          word-break break-all;
+          vertical-align top;
+        div.collection
+          display inline-block;
+          width: 100%;
+          height 30px;
+          line-height 30px;
+          span.time
+            display inline-block;
+            margin-left: 40px;
+            font-size 11px;
+            color:#bbb;
+          .operations
+            float right;
+            margin-right 0px;
+            opacity .15;
+            transition all 0.2s;
+            .icons
+              padding: 1px;
+              margin-right 15px;
+              font-size 14px;
+              cursor pointer
+              color: #000;
+              border-radius 20%;
+              transition all 0.2s;
+              &:hover
+                font-size 18px;
+                color: #fff;
+                background $bgColor1;
+        input.edit-content
+          border: 1px solid #ccc;
+          width: 90%;
+          min-height 60%;
+          background-color: rgba(255,255,255,0.1);
+</style>
