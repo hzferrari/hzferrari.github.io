@@ -18,83 +18,180 @@
       </div>
     </div>
     <div class="width-wrapper">
-      <div class="todo-list-box">
-        <div class="title">
-          正在进行
+      <div class="layouts layout-left">
+        <div class="long-todo-list-box">
+          <div class="title">
+            长期事项
+          </div>
+
+          <transition-group
+            class="todo-list"
+            v-if="longTodoList.length > 0"
+            name="todo-list"
+            tag="ul"
+          >
+            <li
+              class="items todo-list-item"
+              :class="{ 'is-top-item': item.isTop }"
+              v-for="(item, index) in longTodoList"
+              :key="item.id"
+            >
+              <span class="check">
+                <input
+                  type="checkbox"
+                  v-model="item.hasDone"
+                  @change="onTodoListItemCheckChange(item, index, 'longTodoList')"
+                />
+              </span>
+              <div class="content" v-show="!item.isEdit" @click="onItemClick(item)">
+                <span>{{ item.content }}</span>
+              </div>
+              <input
+                :ref="item.id"
+                class="edit-content"
+                type="text"
+                v-model="item.content"
+                v-show="item.isEdit"
+                @blur="onItemInputBlur(item)"
+              />
+              <div class="collection">
+                <span class="time" title="创建日期">{{
+                  formatDate(new Date(item.createTime), "yy-MM-dd hh:mm")
+                }}</span>
+                <span class="operations">
+                  <span title="置顶" v-show="!item.isTop"
+                    ><svg-icon
+                      class="icons"
+                      icon-class="pin"
+                      @click="toTop(item, index, 'longTodoList')"
+                  /></span>
+                  <span title="取消置顶" v-show="item.isTop"
+                    ><svg-icon
+                      class="icons"
+                      icon-class="pin"
+                      style="transform:rotate(-45deg);"
+                      @click="cancelTop(item, index, 'longTodoList')"
+                  /></span>
+                  <span title="移至普通事项"
+                    ><svg-icon
+                      class="icons"
+                      icon-class="timer"
+                      @click="moveItem(item, index, 'longTodoList', 'todoList')"
+                  /></span>
+                  <span title="删除"
+                    ><svg-icon
+                      class="icons"
+                      icon-class="delete"
+                      @click="delItem(item, index, 'longTodoList', true)"
+                  /></span>
+                </span>
+              </div>
+            </li>
+          </transition-group>
+        </div>
+      </div>
+      <div class="layouts layout-middle">
+        <div class="todo-list-box">
+          <div class="title">
+            正在进行
+          </div>
+
+          <transition-group class="todo-list" v-if="todoList.length > 0" name="todo-list" tag="ul">
+            <li
+              class="items todo-list-item"
+              :class="{ 'is-top-item': item.isTop }"
+              v-for="(item, index) in todoList"
+              :key="item.id"
+            >
+              <span class="check">
+                <input
+                  type="checkbox"
+                  v-model="item.hasDone"
+                  @change="onTodoListItemCheckChange(item, index, 'todoList')"
+                />
+              </span>
+              <div class="content" v-show="!item.isEdit" @click="onItemClick(item)">
+                <span>{{ item.content }}</span>
+              </div>
+              <input
+                :ref="item.id"
+                class="edit-content"
+                type="text"
+                v-model="item.content"
+                v-show="item.isEdit"
+                @blur="onItemInputBlur(item)"
+              />
+              <div class="collection">
+                <span class="time" title="创建日期">{{
+                  formatDate(new Date(item.createTime), "yy-MM-dd hh:mm")
+                }}</span>
+                <span class="operations">
+                  <span title="置顶" v-show="!item.isTop"
+                    ><svg-icon
+                      class="icons"
+                      icon-class="pin"
+                      @click="toTop(item, index, 'todoList')"
+                  /></span>
+                  <span title="取消置顶" v-show="item.isTop"
+                    ><svg-icon
+                      class="icons"
+                      icon-class="pin"
+                      style="transform:rotate(-45deg);"
+                      @click="cancelTop(item, index, 'todoList')"
+                  /></span>
+                  <span title="长期事项"
+                    ><svg-icon
+                      class="icons"
+                      icon-class="timer"
+                      @click="moveItem(item, index, 'todoList', 'longTodoList')"
+                  /></span>
+                  <span title="删除"
+                    ><svg-icon
+                      class="icons"
+                      icon-class="delete"
+                      @click="delItem(item, index, 'todoList', true)"
+                  /></span>
+                </span>
+              </div>
+            </li>
+          </transition-group>
         </div>
 
-        <transition-group class="todo-list" v-if="todoList.length > 0" name="todo-list" tag="ul">
-          <li class="items todo-list-item" v-for="(item, index) in todoList" :key="item.id">
-            <span class="check">
-              <input
-                type="checkbox"
-                v-model="item.hasDone"
-                @change="onTodoListItemCheckChange(item, index)"
-              />
-            </span>
-            <div class="content" v-show="!item.isEdit" @click="onItemClick(item)">
-              <span>{{ item.content }}</span>
-            </div>
-            <input
-              :ref="item.id"
-              class="edit-content"
-              type="text"
-              v-model="item.content"
-              v-show="item.isEdit"
-              @blur="onItemInputBlur(item)"
-            />
-            <div class="collection">
-              <span class="time" title="创建日期">{{
-                formatDate(new Date(item.createTime), "yy-MM-dd hh:mm")
-              }}</span>
-              <span class="operations">
-                <span title="置顶"><svg-icon class="icons" icon-class="top"/></span>
-                <span title="长期事项"><svg-icon class="icons" icon-class="timer"/></span>
-                <span title="删除"
-                  ><svg-icon
-                    class="icons"
-                    icon-class="delete"
-                    @click="delItem(item, index, 'todoList', true)"
-                /></span>
-              </span>
-            </div>
-          </li>
-        </transition-group>
-      </div>
+        <div class="done-list-box">
+          <div class="title">
+            已完成
+          </div>
 
-      <div class="done-list-box">
-        <div class="title">
-          已完成
+          <transition-group class="done-list" v-if="doneList.length > 0" name="done-list" tag="ul">
+            <li class="items done-list-item" v-for="(item, index) in doneList" :key="item.id">
+              <span class="check">
+                <input
+                  type="checkbox"
+                  v-model="item.hasDone"
+                  @change="onDoneListItemCheckChange(item, index)"
+                />
+              </span>
+              <div class="content">
+                <span>{{ item.content }}</span>
+              </div>
+              <div class="collection">
+                <span class="time" title="完成日期">{{
+                  formatDate(new Date(item.doneTime), "yy-MM-dd hh:mm")
+                }}</span>
+                <span class="operations">
+                  <span title="删除"
+                    ><svg-icon
+                      class="icons"
+                      icon-class="delete"
+                      @click="delItem(item, index, 'doneList', false)"
+                  /></span>
+                </span>
+              </div>
+            </li>
+          </transition-group>
         </div>
-
-        <transition-group class="done-list" v-if="doneList.length > 0" name="done-list" tag="ul">
-          <li class="items done-list-item" v-for="(item, index) in doneList" :key="item.id">
-            <span class="check">
-              <input
-                type="checkbox"
-                v-model="item.hasDone"
-                @change="onDoneListItemCheckChange(item, index)"
-              />
-            </span>
-            <div class="content">
-              <span>{{ item.content }}</span>
-            </div>
-            <div class="collection">
-              <span class="time" title="删除日期">{{
-                formatDate(new Date(item.doneTime), "yy-MM-dd hh:mm")
-              }}</span>
-              <span class="operations">
-                <span title="删除"
-                  ><svg-icon
-                    class="icons"
-                    icon-class="delete"
-                    @click="delItem(item, index, 'doneList', false)"
-                /></span>
-              </span>
-            </div>
-          </li>
-        </transition-group>
       </div>
+      <div class="layouts layout-right"></div>
     </div>
   </div>
 </template>
@@ -167,10 +264,22 @@ export default {
      * @event
      */
     onTodoInputKeydown(e) {
-      // console.log(e);
       if (e.keyCode === 13) {
         // 按下回车键
         this.add(e);
+      }
+    },
+    /**
+     * @function insertItemUnderTop 将item置于非置顶项的最上方
+     * @param {Object} item 要插入的事项
+     * @param {String} insertListName 要插入的列表名
+     */
+    insertItemUnderTop(item, insertListName) {
+      for (let i = 0; i < this[insertListName].length; i++) {
+        if (!this[insertListName][i].isTop) {
+          this[insertListName].splice(i, 0, item);
+          break;
+        }
       }
     },
     /**
@@ -190,7 +299,13 @@ export default {
           delTime: -1
         };
 
-        this.todoList.unshift(o);
+        // 插入在非置顶项的第一个
+        if (this.todoList.length > 0) {
+          this.insertItemUnderTop(o, "todoList");
+        } else {
+          this.todoList.push(o);
+        }
+
         this.todoInputingValue = "";
       }
     },
@@ -212,13 +327,13 @@ export default {
       item.isEdit = false;
     },
     /**
-     * todolist CheckBox变化时
+     * todolist/longtodolist CheckBox变化时
      */
-    onTodoListItemCheckChange(item, index) {
+    onTodoListItemCheckChange(item, index, listName) {
       if (item.hasDone === false) return;
 
       item.doneTime = new Date().getTime();
-      let tmp = this.todoList.splice(index, 1)[0];
+      let tmp = this[listName].splice(index, 1)[0];
       this.doneList.unshift(tmp);
     },
     /**
@@ -228,7 +343,37 @@ export default {
       if (item.hasDone === true) return;
 
       let tmp = this.doneList.splice(index, 1)[0];
-      this.todoList.unshift(tmp);
+
+      this.insertItemUnderTop(tmp, "todoList");
+    },
+    /**
+     * 置顶。置于整个队列最上方
+     * @param {String} listName 列表名
+     */
+    toTop(item, index, listName) {
+      item.isTop = true;
+      let tmp = this[listName].splice(index, 1)[0];
+      this[listName].unshift(tmp);
+    },
+    /**
+     * 取消置顶，置于非置顶队列的最上方
+     */
+    cancelTop(item, index, listName) {
+      item.isTop = false;
+      let tmp = this[listName].splice(index, 1)[0];
+
+      this.insertItemUnderTop(tmp, listName);
+    },
+    /**
+     * 项目移动
+     * @param {String} fromList 从这个列表移出
+     * @param {String} toList 移到这个列表
+     */
+    moveItem(item, index, fromList, toList) {
+      item.isTop = false;
+      let tmp = this[fromList].splice(index, 1)[0];
+
+      this.insertItemUnderTop(tmp, toList);
     },
     /**
      * 删除
@@ -251,23 +396,25 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="stylus">
-$content-width = 1200px;
-$header-height = 50px;
-$borderRadius = 6px;
-$bgColor1 = #abc;
-$textColor = #000;
+<style scoped lang="scss">
+$content-width: 1200px;
+$header-height: 50px;
+$borderRadius: 6px;
+$bgColor1: #abc;
+$textColor: #000;
 
 // shuffle和排序的过渡动画只需要这个类设置
-.todo-list-item, .done-list-item {
-  transition: all .5s;
+.todo-list-item,
+.done-list-item {
+  transition: all 0.3s;
 }
 // 下面是add和del的动画
-.todo-list-enter-active, .todo-list-leave-active {
-  transition: all .5s ease;
-
+.todo-list-enter-active,
+.todo-list-leave-active {
+  transition: all 0.3s ease;
 }
-.todo-list-enter, .todo-list-leave-to {
+.todo-list-enter,
+.todo-list-leave-to {
   transform: translate3d(-1000px, 0, 0);
   opacity: 0.3;
 }
@@ -276,127 +423,184 @@ $textColor = #000;
   // width: 100px !important;
 }
 
-.done-list-enter-active, .done-list-leave-active {
-  transition: all .5s ease;
+.done-list-enter-active,
+.done-list-leave-active {
+  transition: all 0.5s ease;
 }
-.done-list-enter, .done-list-leave-to {
+.done-list-enter,
+.done-list-leave-to {
   transform: translate3d(1000px, 0, 0);
   opacity: 0.3;
 }
 
-.CS-Todo
-  font-family: 'Microsoft YaHei';
+.CS-Todo {
+  font-family: "Microsoft YaHei";
   font-size: 12px;
   background: #efefef;
-  height 100vh;
+  height: 100vh;
   width: 100vw;
   overflow-y: auto;
   overflow-x: hidden;
-  ul
-    list-style none;
-  .width-wrapper
-    width:$content-width;
-    display block;
+  ul {
+    list-style: none;
+  }
+  .width-wrapper {
+    // width:$content-width;
+    width: 100%;
+    display: block;
     margin: 0 auto;
-  .header
-    position relative;
-    width 100%;
-    background $bgColor1;
-    height $header-height;
-    line-height $header-height;
-    text-align center;
-    .title, .todo-input, .todo-input-right-space
-      display inline-block;
-      margin:0;
+  }
+  .header {
+    position: relative;
+    width: 100%;
+    background: $bgColor1;
+    height: $header-height;
+    line-height: $header-height;
+    text-align: center;
+    .title,
+    .todo-input,
+    .todo-input-right-space {
+      display: inline-block;
+      margin: 0;
       width: 33%;
-    .title
-      font-size 30px;
-      font-weight 700;
+    }
+    .title {
+      font-size: 30px;
+      font-weight: 700;
       color: #507f96;
       text-shadow: 3px 2px 4px #efefef;
       // text-align left;
-    .todo-input
+    }
+    .todo-input {
       margin: 0 auto;
-      height $header-height;
-      line-height $header-height;
-      vertical-align top;
-      input
+      height: $header-height;
+      line-height: $header-height;
+      vertical-align: top;
+      input {
         padding: 0 10px;
         border: 1px solid #ccc;
-        height 30px;
+        height: 30px;
         width: 100%;
-        border-radius $borderRadius;
-        font-family: 'Microsoft YaHei';
+        border-radius: $borderRadius;
+        font-family: "Microsoft YaHei";
         letter-spacing: 0.6px;
         font-size: 12px;
-  .todo-list-box, .done-list-box
-    display inline-block;
-    width: 45%;
-    margin: 20px;
-    vertical-align top;
-    .title
+      }
+    }
+  }
+  .layouts {
+    display: inline-block;
+    vertical-align: top;
+    &.layout-left,
+    &.layout-right {
+      width: 30%;
+    }
+    &.layout-middle {
+      width: 40%;
+    }
+  }
+  .todo-list-box,
+  .done-list-box,
+  .long-todo-list-box {
+    // display inline-block;
+    width: 90%;
+    margin: 20px auto;
+    vertical-align: top;
+    .title {
       margin-top: 10px;
-      font-size:16px;
-      font-weight 700;
-    .todo-list,.done-list
-      .items
-        position relative;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .todo-list .items {
+      background: #fff;
+      &.is-top-item {
+        background: #f9ffbd;
+      }
+    }
+    .done-list .items {
+      background: #edebeb;
+    }
+    .todo-list,
+    .done-list {
+      margin-left: -5%;
+      .items {
+        position: relative;
         margin: 15px auto;
         padding-top: 3px;
         width: 100%;
-        min-height 40px;
-        line-height 30px;
+        min-height: 40px;
+        line-height: 30px;
         font-size: 13px;
-        background: #fff;
+        // background: #fff;
         color: $textColor;
-        border-radius $borderRadius;
-        &:hover
-          .operations
-            opacity 1!important;
-        .check
-          input
+        border-radius: $borderRadius;
+        &:hover {
+          .operations {
+            opacity: 1 !important;
+          }
+        }
+        .check {
+          display: inline-block;
+          width: 8%;
+          line-height: 10px;
+          input {
+            // display block;
+            // margin: 0 auto;
+            margin-left: 30%;
             width: 18px;
             height: 18px;
-            margin: 0 10px;
             vertical-align: middle;
-            cursor pointer
-        div.content
-          display inline-block;
+            cursor: pointer;
+          }
+        }
+        div.content {
+          display: inline-block;
           width: 90%;
           letter-spacing: 0.6px;
-          cursor pointer;
-          word-break break-all;
-          vertical-align top;
-        div.collection
-          display inline-block;
+          cursor: pointer;
+          word-break: break-all;
+          vertical-align: top;
+        }
+        div.collection {
+          display: inline-block;
           width: 100%;
-          height 30px;
-          line-height 30px;
-          span.time
-            display inline-block;
-            margin-left: 40px;
-            font-size 11px;
-            color:#bbb;
-          .operations
-            float right;
-            margin-right 0px;
-            opacity .15;
-            transition all 0.2s;
-            .icons
-              padding: 1px;
-              margin-right 15px;
-              font-size 14px;
-              cursor pointer
-              color: #000;
-              border-radius 20%;
-              transition all 0.2s;
-              &:hover
-                font-size 18px;
-                color: #fff;
-                background $bgColor1;
-        input.edit-content
+          height: 30px;
+          line-height: 30px;
+          span.time {
+            display: inline-block;
+            margin-left: 8%;
+            font-size: 11px;
+            color: #bbb;
+          }
+          .operations {
+            float: right;
+            margin-right: 0px;
+            opacity: 0.15;
+            transition: all 0.2s;
+          }
+          .icons {
+            padding: 1px;
+            margin-right: 15px;
+            font-size: 14px;
+            cursor: pointer;
+            color: #000;
+            border-radius: 20%;
+            transition: all 0.2s;
+            &:hover {
+              font-size: 18px;
+              color: #fff;
+              background: $bgColor1;
+            }
+          }
+        }
+        input.edit-content {
           border: 1px solid #ccc;
           width: 90%;
-          min-height 60%;
-          background-color: rgba(255,255,255,0.1);
+          min-height: 60%;
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+      }
+    }
+  }
+}
 </style>
