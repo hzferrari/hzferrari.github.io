@@ -1,18 +1,18 @@
 <template>
   <div id="app">
-    <HelloWorld />
+    <todoPC />
     <!-- <icons /> -->
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import todoPC from "@/views/todo_pc.vue";
 import icons from "./components/Icon";
 
 export default {
   name: "app",
   components: {
-    HelloWorld,
+    todoPC,
     icons
   }
 };

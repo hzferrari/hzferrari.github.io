@@ -22,12 +22,13 @@
         <div class="long-todo-list-box">
           <div class="title">
             长期事项
+            <span class="items-sum">{{longTodoList.length}}</span>
           </div>
 
           <transition-group
-            class="todo-list"
+            class="long-todo-list"
             v-if="longTodoList.length > 0"
-            name="todo-list"
+            name="list-anime1"
             tag="ul"
           >
             <li
@@ -67,14 +68,13 @@
                   /></span>
                   <span title="取消置顶" v-show="item.isTop"
                     ><svg-icon
-                      class="icons"
+                      class="icons is-top"
                       icon-class="pin"
-                      style="transform:rotate(-45deg);"
                       @click="cancelTop(item, index, 'longTodoList')"
                   /></span>
                   <span title="移至普通事项"
                     ><svg-icon
-                      class="icons"
+                      class="icons long-time"
                       icon-class="timer"
                       @click="moveItem(item, index, 'longTodoList', 'todoList')"
                   /></span>
@@ -82,7 +82,7 @@
                     ><svg-icon
                       class="icons"
                       icon-class="delete"
-                      @click="delItem(item, index, 'longTodoList', true)"
+                      @click="delItem(item, index, 'longTodoList', false)"
                   /></span>
                 </span>
               </div>
@@ -96,7 +96,12 @@
             正在进行
           </div>
 
-          <transition-group class="todo-list" v-if="todoList.length > 0" name="todo-list" tag="ul">
+          <transition-group
+            class="todo-list"
+            v-if="todoList.length > 0"
+            name="list-anime1"
+            tag="ul"
+          >
             <li
               class="items todo-list-item"
               :class="{ 'is-top-item': item.isTop }"
@@ -134,9 +139,8 @@
                   /></span>
                   <span title="取消置顶" v-show="item.isTop"
                     ><svg-icon
-                      class="icons"
+                      class="icons is-top"
                       icon-class="pin"
-                      style="transform:rotate(-45deg);"
                       @click="cancelTop(item, index, 'todoList')"
                   /></span>
                   <span title="长期事项"
@@ -149,7 +153,7 @@
                     ><svg-icon
                       class="icons"
                       icon-class="delete"
-                      @click="delItem(item, index, 'todoList', true)"
+                      @click="delItem(item, index, 'todoList', false)"
                   /></span>
                 </span>
               </div>
@@ -162,7 +166,12 @@
             已完成
           </div>
 
-          <transition-group class="done-list" v-if="doneList.length > 0" name="done-list" tag="ul">
+          <transition-group
+            class="done-list"
+            v-if="doneList.length > 0"
+            name="list-anime2"
+            tag="ul"
+          >
             <li class="items done-list-item" v-for="(item, index) in doneList" :key="item.id">
               <span class="check">
                 <input
@@ -184,6 +193,36 @@
                       class="icons"
                       icon-class="delete"
                       @click="delItem(item, index, 'doneList', false)"
+                  /></span>
+                </span>
+              </div>
+            </li>
+          </transition-group>
+        </div>
+
+        <div class="del-list-box">
+          <div class="title">
+            已删除
+          </div>
+
+          <transition-group class="del-list" v-if="delList.length > 0" name="list-anime2" tag="ul">
+            <li class="items del-list-item" v-for="(item, index) in delList" :key="item.id">
+              <span class="check">
+                <input type="checkbox" v-model="item.hasDone" disabled />
+              </span>
+              <div class="content">
+                <del>{{ item.content }}</del>
+              </div>
+              <div class="collection">
+                <span class="time" title="完成日期">{{
+                  formatDate(new Date(item.delTime), "yy-MM-dd hh:mm")
+                }}</span>
+                <span class="operations">
+                  <span title="彻底删除"
+                    ><svg-icon
+                      class="icons"
+                      icon-class="delete"
+                      @click="delItem(item, index, 'delList', false)"
                   /></span>
                 </span>
               </div>
@@ -278,6 +317,10 @@ export default {
       for (let i = 0; i < this[insertListName].length; i++) {
         if (!this[insertListName][i].isTop) {
           this[insertListName].splice(i, 0, item);
+          break;
+        } else if (i === this[insertListName].length - 1) {
+          // 全部都是置顶的情况
+          this[insertListName].push(item);
           break;
         }
       }
@@ -381,15 +424,20 @@ export default {
      * @param {Boolean} flag 是否需要弹窗确认
      */
     delItem(item, index, listName, flag) {
-      this[listName].splice(index, 1);
-      // if (flag) {
-      //   let cf = confirm(`确认要删除【${item.content}】吗？`);
-      //   if (cf) {
-      //     this[listName].splice(index, 1);
-      //   }
-      // } else {
-      //   this[listName].splice(index, 1);
-      // }
+      let tmp;
+      if (flag) {
+        let cf = confirm(`确认要删除【${item.content}】吗？`);
+        if (cf) {
+          tmp = this[listName].splice(index, 1)[0];
+        }
+      } else {
+        tmp = this[listName].splice(index, 1)[0];
+      }
+
+      if (listName !== "delList") {
+        tmp.delTime = new Date().getTime();
+        this.delList.unshift(tmp);
+      }
     }
   }
 };
@@ -405,30 +453,31 @@ $textColor: #000;
 
 // shuffle和排序的过渡动画只需要这个类设置
 .todo-list-item,
-.done-list-item {
+.done-list-item,
+.del-list-item {
   transition: all 0.3s;
 }
 // 下面是add和del的动画
-.todo-list-enter-active,
-.todo-list-leave-active {
+.list-anime1-enter-active,
+.list-anime1-leave-active {
   transition: all 0.3s ease;
 }
-.todo-list-enter,
-.todo-list-leave-to {
+.list-anime1-enter,
+.list-anime1-leave-to {
   transform: translate3d(-1000px, 0, 0);
   opacity: 0.3;
 }
-.todo-list-leave-to {
+.list-anime1-leave-to {
   // position: absolute !important;
   // width: 100px !important;
 }
 
-.done-list-enter-active,
-.done-list-leave-active {
+.list-anime2-enter-active,
+.list-anime2-leave-active {
   transition: all 0.5s ease;
 }
-.done-list-enter,
-.done-list-leave-to {
+.list-anime2-enter,
+.list-anime2-leave-to {
   transform: translate3d(1000px, 0, 0);
   opacity: 0.3;
 }
@@ -443,6 +492,8 @@ $textColor: #000;
   overflow-x: hidden;
   ul {
     list-style: none;
+    padding: 0;
+    margin: 0;
   }
   .width-wrapper {
     // width:$content-width;
@@ -480,11 +531,14 @@ $textColor: #000;
         padding: 0 10px;
         border: 1px solid #ccc;
         height: 30px;
-        width: 100%;
+        width: 96%;
         border-radius: $borderRadius;
         font-family: "Microsoft YaHei";
         letter-spacing: 0.6px;
         font-size: 12px;
+        &:focus {
+          outline: none;
+        }
       }
     }
   }
@@ -501,37 +555,49 @@ $textColor: #000;
   }
   .todo-list-box,
   .done-list-box,
-  .long-todo-list-box {
-    // display inline-block;
+  .del-list-box {
     width: 90%;
+  }
+  .long-todo-list-box {
+    width: 70%;
+  }
+
+  .todo-list-box,
+  .done-list-box,
+  .long-todo-list-box,
+  .del-list-box {
     margin: 20px auto;
     vertical-align: top;
     .title {
       margin-top: 10px;
-      font-size: 16px;
-      font-weight: 700;
-    }
-    .todo-list .items {
-      background: #fff;
-      &.is-top-item {
-        background: #f9ffbd;
+      font-size: 15px;
+      font-weight: 600;
+      color: #555;
+      letter-spacing: 0.7px;
+      .items-sum{
+        width: 10%;
+        
+        float: right;
+        font-size: 12px;
+        padding: 2px;
+        border-radius: 50%;
+        background: $bgColor1;
       }
     }
-    .done-list .items {
-      background: #edebeb;
-    }
+
     .todo-list,
-    .done-list {
-      margin-left: -5%;
+    .done-list,
+    .long-todo-list,
+    .del-list {
       .items {
         position: relative;
-        margin: 15px auto;
+        margin: 10px auto;
         padding-top: 3px;
         width: 100%;
         min-height: 40px;
         line-height: 30px;
         font-size: 13px;
-        // background: #fff;
+        background: #fff;
         color: $textColor;
         border-radius: $borderRadius;
         &:hover {
@@ -544,9 +610,9 @@ $textColor: #000;
           width: 8%;
           line-height: 10px;
           input {
-            // display block;
-            // margin: 0 auto;
-            margin-left: 30%;
+            display: block;
+            margin: 0 auto;
+            // margin-left: 30%;
             width: 18px;
             height: 18px;
             vertical-align: middle;
@@ -564,8 +630,8 @@ $textColor: #000;
         div.collection {
           display: inline-block;
           width: 100%;
-          height: 30px;
-          line-height: 30px;
+          height: 20px;
+          line-height: 20px;
           span.time {
             display: inline-block;
             margin-left: 8%;
@@ -586,19 +652,62 @@ $textColor: #000;
             color: #000;
             border-radius: 20%;
             transition: all 0.2s;
+            &.is-top {
+              transform: rotate(-45deg);
+              &:hover {
+                transform: rotate(0) scale(1.5);
+              }
+            }
             &:hover {
-              font-size: 18px;
+              // font-size: 18px;
+              transform: scale(1.5);
               color: #fff;
               background: $bgColor1;
             }
           }
         }
         input.edit-content {
-          border: 1px solid #ccc;
+          padding: 2px;
           width: 90%;
-          min-height: 60%;
+          height: 26px;
+          line-height: 26px;
+          // min-height: 60%;
           background-color: rgba(255, 255, 255, 0.1);
+          border: 1px solid #ddd;
+          border-radius: $borderRadius;
+          box-sizing: border-box;
+          &:focus {
+            outline: none;
+          }
         }
+      }
+    }
+
+    .todo-list,
+    .long-todo-list {
+      .items {
+        background: #fff;
+        &.is-top-item {
+          background: #f9ffbd;
+        }
+      }
+    }
+    .long-todo-list {
+      .items {
+        .collection {
+          .icons.long-time {
+            &:hover {
+              transform: rotate(45deg) scale(1.5);
+            }
+          }
+        }
+      }
+    }
+    .done-list,
+    .del-list {
+      .items {
+        background: #eaeaea;
+        color: #848484;
       }
     }
   }
