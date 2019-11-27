@@ -4,7 +4,7 @@ function resolve(dir) {
 }
 
 module.exports = {
-  publicPath: "./", // 设置打包文件相对路径
+  publicPath: "/", // 设置打包文件相对路径
   outputDir: "dist",
   lintOnSave: false,
   productionSourceMap: false,
