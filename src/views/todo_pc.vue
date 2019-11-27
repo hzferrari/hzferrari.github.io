@@ -22,7 +22,7 @@
         <div class="long-todo-list-box">
           <div class="title">
             长期事项
-            <span class="items-sum">{{longTodoList.length}}</span>
+            <span class="items-sum">{{ longTodoList.length }}</span>
           </div>
 
           <transition-group
@@ -314,6 +314,10 @@ export default {
      * @param {String} insertListName 要插入的列表名
      */
     insertItemUnderTop(item, insertListName) {
+      if (this[insertListName].length === 0) {
+        this[insertListName].push(item);
+        return;
+      }
       for (let i = 0; i < this[insertListName].length; i++) {
         if (!this[insertListName][i].isTop) {
           this[insertListName].splice(i, 0, item);
@@ -343,11 +347,7 @@ export default {
         };
 
         // 插入在非置顶项的第一个
-        if (this.todoList.length > 0) {
-          this.insertItemUnderTop(o, "todoList");
-        } else {
-          this.todoList.push(o);
-        }
+        this.insertItemUnderTop(o, "todoList");
 
         this.todoInputingValue = "";
       }
@@ -574,9 +574,9 @@ $textColor: #000;
       font-weight: 600;
       color: #555;
       letter-spacing: 0.7px;
-      .items-sum{
+      .items-sum {
         width: 10%;
-        
+
         float: right;
         font-size: 12px;
         padding: 2px;
