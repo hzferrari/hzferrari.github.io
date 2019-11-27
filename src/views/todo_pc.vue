@@ -322,41 +322,46 @@ export default {
      *  初始化拖拽
      */
     initSortable() {
-      // console.log(
-      //   ": ",
-      //   document.querySelectorAll(
-      //     "#app > div > div.width-wrapper > div.layouts.layout-middle > div.todo-list-box > ul "
-      //   )
-      // );
       let _this = this;
+      console.log(
+        ": ",
+        document.querySelectorAll("#app > div > div.width-wrapper > div.layouts.layout-middle ul ")
+      );
       const el = document.querySelectorAll(
         "#app > div > div.width-wrapper > div.layouts.layout-middle > div.todo-list-box > ul "
       )[0];
-      Sortable.create(el, {
-        ghostClass: "list-item-sortable-ghost", // 拖拽时的class（可设置拖拽时的显示样式）
-        scroll: true,
-        scrollSpeed: 5, // px
-        animation: 150,
-        scrollSensitivity: 30,
-        onUpdate: evt => {
-          // sortable改变了真实DOM的排序后,在回调函数里还原移动过的DOM（避免和Vue自带的DOM操作冲突）
-          let newIndex = evt.newIndex;
-          let oldIndex = evt.oldIndex;
-          let newChild = el.children[newIndex];
-          let oldChild = el.children[oldIndex];
-          // 删除移动过的节点，并还原其位置(产生移动动画效果)
-          // el.removeChild(newChild);
-          // if (newIndex > oldIndex) {
-          //   el.insertBefore(newChild, oldChild);
-          // } else {
-          //   el.insertBefore(newChild, oldChild.nextSibling);
-          // }
-          // 更新数组
-          let tpm = _this.todoList.splice(oldIndex, 1);
-          _this.todoList.splice(newIndex, 0, tpm[0]);
-          // Vue下一个tick就会走patch更新DOM
-        }
-      });
+
+      setSortable(el, 'todoList');
+
+      function setSortable(el,listName) {
+        Sortable.create(el, {
+          ghostClass: "list-item-sortable-ghost", // 拖拽时的class（可设置拖拽时的显示样式）
+          scroll: true,
+          scrollSpeed: 5, // px
+          animation: 150,
+          scrollSensitivity: 30,
+          onUpdate: evt => {
+            // sortable改变了真实DOM的排序后,在回调函数里还原移动过的DOM（避免和Vue自带的DOM操作冲突）
+            let newIndex = evt.newIndex;
+            let oldIndex = evt.oldIndex;
+
+            // 删除移动过的节点，并还原其位置(产生移动动画效果)
+            // let newChild = el.children[newIndex];
+            // let oldChild = el.children[oldIndex];
+            // el.removeChild(newChild);
+            // if (newIndex > oldIndex) {
+            //   el.insertBefore(newChild, oldChild);
+            // } else {
+            //   el.insertBefore(newChild, oldChild.nextSibling);
+            // }
+
+            // 更新数组
+            let tpm = _this[listName].splice(oldIndex, 1);
+            _this[listName].splice(newIndex, 0, tpm[0]);
+            // Vue下一个tick就会走patch更新DOM
+          }
+        });
+      }
     },
     /**
      * @function insertItemUnderTop 将item置于非置顶项的最上方
