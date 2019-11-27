@@ -9,7 +9,7 @@
           <input
             v-model="todoInputingValue"
             type="text"
-            placeholder="添加todo"
+            placeholder="按下Enter，添加todo"
             autocomplete="off"
             @keydown="onTodoInputKeydown"
           />
@@ -20,7 +20,7 @@
     <div class="width-wrapper">
       <div class="layouts layout-left">
         <div class="long-todo-list-box">
-          <div class="title">
+          <div class="title" v-if="longTodoList.length > 0">
             长期事项
             <span class="items-sum">{{ longTodoList.length }}</span>
           </div>
@@ -57,7 +57,7 @@
               />
               <div class="collection">
                 <span class="time" title="创建日期">{{
-                  formatDate(new Date(item.createTime), "yy-MM-dd hh:mm")
+                  formatDate(new Date(item.createTime), "yyyy-MM-dd hh:mm")
                 }}</span>
                 <span class="operations">
                   <span title="置顶" v-show="!item.isTop"
@@ -94,6 +94,7 @@
         <div class="todo-list-box">
           <div class="title">
             正在进行
+            <span class="items-sum">{{ todoList.length }}</span>
           </div>
 
           <transition-group
@@ -128,7 +129,7 @@
               />
               <div class="collection">
                 <span class="time" title="创建日期">{{
-                  formatDate(new Date(item.createTime), "yy-MM-dd hh:mm")
+                  formatDate(new Date(item.createTime), "yyyy-MM-dd hh:mm")
                 }}</span>
                 <span class="operations">
                   <span title="置顶" v-show="!item.isTop"
@@ -164,6 +165,7 @@
         <div class="done-list-box">
           <div class="title">
             已完成
+            <span class="items-sum">{{ doneList.length }}</span>
           </div>
 
           <transition-group
@@ -185,7 +187,7 @@
               </div>
               <div class="collection">
                 <span class="time" title="完成日期">{{
-                  formatDate(new Date(item.doneTime), "yy-MM-dd hh:mm")
+                  formatDate(new Date(item.doneTime), "yyyy-MM-dd hh:mm")
                 }}</span>
                 <span class="operations">
                   <span title="删除"
@@ -201,8 +203,9 @@
         </div>
 
         <div class="del-list-box">
-          <div class="title">
+          <div class="title" v-if="delList.length > 0">
             已删除
+            <span class="items-sum">{{ delList.length }}</span>
           </div>
 
           <transition-group class="del-list" v-if="delList.length > 0" name="list-anime2" tag="ul">
@@ -214,10 +217,13 @@
                 <del>{{ item.content }}</del>
               </div>
               <div class="collection">
-                <span class="time" title="完成日期">{{
-                  formatDate(new Date(item.delTime), "yy-MM-dd hh:mm")
+                <span class="time" title="删除日期">{{
+                  formatDate(new Date(item.delTime), "yyyy-MM-dd hh:mm")
                 }}</span>
                 <span class="operations">
+                  <span title="恢复项目"
+                    ><svg-icon class="icons" icon-class="return" @click="returnItem(item, index)"
+                  /></span>
                   <span title="彻底删除"
                     ><svg-icon
                       class="icons"
@@ -236,6 +242,7 @@
 </template>
 
 <script>
+import Sortable from "sortablejs";
 import util from "@/utils/util";
 
 export default {
@@ -284,6 +291,9 @@ export default {
     this.recoverData("longTodoList");
     this.recoverData("delList");
   },
+  mounted() {
+    this.initSortable();
+  },
   methods: {
     formatDate(date, format) {
       return util.formatDate(date, format);
@@ -307,6 +317,46 @@ export default {
         // 按下回车键
         this.add(e);
       }
+    },
+    /**
+     *  初始化拖拽
+     */
+    initSortable() {
+      // console.log(
+      //   ": ",
+      //   document.querySelectorAll(
+      //     "#app > div > div.width-wrapper > div.layouts.layout-middle > div.todo-list-box > ul "
+      //   )
+      // );
+      let _this = this;
+      const el = document.querySelectorAll(
+        "#app > div > div.width-wrapper > div.layouts.layout-middle > div.todo-list-box > ul "
+      )[0];
+      Sortable.create(el, {
+        ghostClass: "list-item-sortable-ghost", // 拖拽时的class（可设置拖拽时的显示样式）
+        scroll: true,
+        scrollSpeed: 5, // px
+        animation: 150,
+        scrollSensitivity: 30,
+        onUpdate: evt => {
+          // sortable改变了真实DOM的排序后,在回调函数里还原移动过的DOM（避免和Vue自带的DOM操作冲突）
+          let newIndex = evt.newIndex;
+          let oldIndex = evt.oldIndex;
+          let newChild = el.children[newIndex];
+          let oldChild = el.children[oldIndex];
+          // 删除移动过的节点，并还原其位置(产生移动动画效果)
+          // el.removeChild(newChild);
+          // if (newIndex > oldIndex) {
+          //   el.insertBefore(newChild, oldChild);
+          // } else {
+          //   el.insertBefore(newChild, oldChild.nextSibling);
+          // }
+          // 更新数组
+          let tpm = _this.todoList.splice(oldIndex, 1);
+          _this.todoList.splice(newIndex, 0, tpm[0]);
+          // Vue下一个tick就会走patch更新DOM
+        }
+      });
     },
     /**
      * @function insertItemUnderTop 将item置于非置顶项的最上方
@@ -438,6 +488,17 @@ export default {
         tmp.delTime = new Date().getTime();
         this.delList.unshift(tmp);
       }
+    },
+    /**
+     * 从删除列表中恢复项目到todolist或doneList
+     */
+    returnItem(item, index) {
+      let tmp = this.delList.splice(index, 1)[0];
+      if (!item.hasDone) {
+        this.insertItemUnderTop(tmp, "todoList");
+      } else {
+        this.insertItemUnderTop(tmp, "doneList");
+      }
     }
   }
 };
@@ -451,6 +512,7 @@ $borderRadius: 6px;
 $bgColor1: #abc;
 $textColor: #000;
 
+/**列表变化样式 */
 // shuffle和排序的过渡动画只需要这个类设置
 .todo-list-item,
 .done-list-item,
@@ -480,6 +542,13 @@ $textColor: #000;
 .list-anime2-leave-to {
   transform: translate3d(1000px, 0, 0);
   opacity: 0.3;
+}
+
+/**拖动样式 */
+.list-item-sortable-ghost {
+  opacity: 0.3;
+  color: #fff !important;
+  background: $bgColor1 !important;
 }
 
 .CS-Todo {
@@ -570,18 +639,25 @@ $textColor: #000;
     vertical-align: top;
     .title {
       margin-top: 10px;
+      height: 17px;
+      line-height: 17px;
       font-size: 15px;
       font-weight: 600;
       color: #555;
       letter-spacing: 0.7px;
       .items-sum {
-        width: 10%;
-
-        float: right;
-        font-size: 12px;
+        display: inline-block;
         padding: 2px;
-        border-radius: 50%;
+        // float: right;
+        min-width: 16px;
+        height: 12px;
+        line-height: 12px;
+        font-size: 10px;
+        text-align: center;
+        border-radius: $borderRadius;
+        color: #fff;
         background: $bgColor1;
+        vertical-align: middle;
       }
     }
 
@@ -601,6 +677,7 @@ $textColor: #000;
         color: $textColor;
         border-radius: $borderRadius;
         &:hover {
+          cursor: move;
           .operations {
             opacity: 1 !important;
           }
@@ -635,8 +712,8 @@ $textColor: #000;
           span.time {
             display: inline-block;
             margin-left: 8%;
-            font-size: 11px;
-            color: #bbb;
+            font-size: 9px;
+            color: #ccc;
           }
           .operations {
             float: right;
