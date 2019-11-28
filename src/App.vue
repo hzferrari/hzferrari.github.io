@@ -2,6 +2,8 @@
   <div id="app">
     <todoPC />
     <!-- <icons /> -->
+
+    <div style="text-align:center;margin-top:50px;">Copyright © 2019 ~Chriz~</div>
   </div>
 </template>
 
@@ -19,13 +21,19 @@ export default {
 </script>
 
 <style>
+body,
+html {
+  margin: 0;
+  padding: 0;
+}
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-body, html {
-  margin: 0;
-  padding: 0;
+
+  background: #efefef;
+  min-height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
 }
 </style>

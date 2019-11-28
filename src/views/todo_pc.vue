@@ -23,71 +23,80 @@
           <div class="title" v-if="longTodoList.length > 0">
             长期事项
             <span class="items-sum">{{ longTodoList.length }}</span>
+            <span class="collection"
+              ><svg-icon
+                class="icons"
+                :class="{ rotate: !longTodoListVisible }"
+                icon-class="down"
+                @click="foldList('longTodoList')"
+            /></span>
           </div>
-
-          <transition-group
-            class="long-todo-list"
-            v-if="longTodoList.length > 0"
-            name="list-anime1"
-            tag="ul"
-          >
-            <li
-              class="items todo-list-item"
-              :class="{ 'is-top-item': item.isTop }"
-              v-for="(item, index) in longTodoList"
-              :key="item.id"
+          <transition name="list-anime3">
+            <transition-group
+              class="long-todo-list"
+              v-if="longTodoList.length > 0"
+              v-show="longTodoListVisible"
+              name="list-anime1"
+              tag="ul"
             >
-              <span class="check">
-                <input
-                  type="checkbox"
-                  v-model="item.hasDone"
-                  @change="onTodoListItemCheckChange(item, index, 'longTodoList')"
-                />
-              </span>
-              <div class="content" v-show="!item.isEdit" @click="onItemClick(item)">
-                <span>{{ item.content }}</span>
-              </div>
-              <input
-                :ref="item.id"
-                class="edit-content"
-                type="text"
-                v-model="item.content"
-                v-show="item.isEdit"
-                @blur="onItemInputBlur(item)"
-              />
-              <div class="collection">
-                <span class="time" title="创建日期">{{
-                  formatDate(new Date(item.createTime), "yyyy-MM-dd hh:mm")
-                }}</span>
-                <span class="operations">
-                  <span title="置顶" v-show="!item.isTop"
-                    ><svg-icon
-                      class="icons"
-                      icon-class="pin"
-                      @click="toTop(item, index, 'longTodoList')"
-                  /></span>
-                  <span title="取消置顶" v-show="item.isTop"
-                    ><svg-icon
-                      class="icons is-top"
-                      icon-class="pin"
-                      @click="cancelTop(item, index, 'longTodoList')"
-                  /></span>
-                  <span title="移至普通事项"
-                    ><svg-icon
-                      class="icons long-time"
-                      icon-class="timer"
-                      @click="moveItem(item, index, 'longTodoList', 'todoList')"
-                  /></span>
-                  <span title="删除"
-                    ><svg-icon
-                      class="icons"
-                      icon-class="delete"
-                      @click="delItem(item, index, 'longTodoList', false)"
-                  /></span>
+              <li
+                class="items todo-list-item"
+                :class="{ 'is-top-item': item.isTop }"
+                v-for="(item, index) in longTodoList"
+                :key="item.id"
+              >
+                <span class="check">
+                  <input
+                    type="checkbox"
+                    v-model="item.hasDone"
+                    @change="onTodoListItemCheckChange(item, index, 'longTodoList')"
+                  />
                 </span>
-              </div>
-            </li>
-          </transition-group>
+                <div class="content" v-show="!item.isEdit" @click="onItemClick(item)">
+                  <span>{{ item.content }}</span>
+                </div>
+                <input
+                  :ref="item.id"
+                  class="edit-content"
+                  type="text"
+                  v-model="item.content"
+                  v-show="item.isEdit"
+                  @blur="onItemInputBlur(item)"
+                />
+                <div class="collection">
+                  <span class="time" title="创建日期">{{
+                    formatDate(new Date(item.createTime), "yyyy-MM-dd hh:mm")
+                  }}</span>
+                  <span class="operations">
+                    <span title="置顶" v-show="!item.isTop"
+                      ><svg-icon
+                        class="icons"
+                        icon-class="pin"
+                        @click="toTop(item, index, 'longTodoList')"
+                    /></span>
+                    <span title="取消置顶" v-show="item.isTop"
+                      ><svg-icon
+                        class="icons is-top"
+                        icon-class="pin"
+                        @click="cancelTop(item, index, 'longTodoList')"
+                    /></span>
+                    <span title="移至普通事项"
+                      ><svg-icon
+                        class="icons long-time"
+                        icon-class="timer"
+                        @click="moveItem(item, index, 'longTodoList', 'todoList')"
+                    /></span>
+                    <span title="删除"
+                      ><svg-icon
+                        class="icons"
+                        icon-class="delete"
+                        @click="delItem(item, index, 'longTodoList', false)"
+                    /></span>
+                  </span>
+                </div>
+              </li>
+            </transition-group>
+          </transition>
         </div>
       </div>
       <div class="layouts layout-middle">
@@ -95,145 +104,178 @@
           <div class="title">
             正在进行
             <span class="items-sum">{{ todoList.length }}</span>
-          </div>
 
-          <transition-group
-            class="todo-list"
-            v-if="todoList.length > 0"
-            name="list-anime1"
-            tag="ul"
-          >
-            <li
-              class="items todo-list-item"
-              :class="{ 'is-top-item': item.isTop }"
-              v-for="(item, index) in todoList"
-              :key="item.id"
+            <span class="collection"
+              ><svg-icon
+                class="icons"
+                :class="{ rotate: !todoListVisible }"
+                icon-class="down"
+                @click="foldList('todoList')"
+            /></span>
+          </div>
+          <transition name="list-anime3">
+            <transition-group
+              class="todo-list"
+              v-if="todoList.length > 0"
+              v-show="todoListVisible"
+              name="list-anime1"
+              tag="ul"
             >
-              <span class="check">
-                <input
-                  type="checkbox"
-                  v-model="item.hasDone"
-                  @change="onTodoListItemCheckChange(item, index, 'todoList')"
-                />
-              </span>
-              <div class="content" v-show="!item.isEdit" @click="onItemClick(item)">
-                <span>{{ item.content }}</span>
-              </div>
-              <input
-                :ref="item.id"
-                class="edit-content"
-                type="text"
-                v-model="item.content"
-                v-show="item.isEdit"
-                @blur="onItemInputBlur(item)"
-              />
-              <div class="collection">
-                <span class="time" title="创建日期">{{
-                  formatDate(new Date(item.createTime), "yyyy-MM-dd hh:mm")
-                }}</span>
-                <span class="operations">
-                  <span title="置顶" v-show="!item.isTop"
-                    ><svg-icon
-                      class="icons"
-                      icon-class="pin"
-                      @click="toTop(item, index, 'todoList')"
-                  /></span>
-                  <span title="取消置顶" v-show="item.isTop"
-                    ><svg-icon
-                      class="icons is-top"
-                      icon-class="pin"
-                      @click="cancelTop(item, index, 'todoList')"
-                  /></span>
-                  <span title="长期事项"
-                    ><svg-icon
-                      class="icons"
-                      icon-class="timer"
-                      @click="moveItem(item, index, 'todoList', 'longTodoList')"
-                  /></span>
-                  <span title="删除"
-                    ><svg-icon
-                      class="icons"
-                      icon-class="delete"
-                      @click="delItem(item, index, 'todoList', false)"
-                  /></span>
+              <li
+                class="items todo-list-item"
+                :class="{ 'is-top-item': item.isTop }"
+                v-for="(item, index) in todoList"
+                :key="item.id"
+              >
+                <span class="check">
+                  <input
+                    type="checkbox"
+                    v-model="item.hasDone"
+                    @change="onTodoListItemCheckChange(item, index, 'todoList')"
+                  />
                 </span>
-              </div>
-            </li>
-          </transition-group>
+                <div class="content" v-show="!item.isEdit" @click="onItemClick(item)">
+                  <span>{{ item.content }}</span>
+                </div>
+                <input
+                  :ref="item.id"
+                  class="edit-content"
+                  type="text"
+                  v-model="item.content"
+                  v-show="item.isEdit"
+                  @blur="onItemInputBlur(item)"
+                />
+                <div class="collection">
+                  <span class="time" title="创建日期">{{
+                    formatDate(new Date(item.createTime), "yyyy-MM-dd hh:mm")
+                  }}</span>
+                  <span class="operations">
+                    <span title="置顶" v-show="!item.isTop"
+                      ><svg-icon
+                        class="icons"
+                        icon-class="pin"
+                        @click="toTop(item, index, 'todoList')"
+                    /></span>
+                    <span title="取消置顶" v-show="item.isTop"
+                      ><svg-icon
+                        class="icons is-top"
+                        icon-class="pin"
+                        @click="cancelTop(item, index, 'todoList')"
+                    /></span>
+                    <span title="长期事项"
+                      ><svg-icon
+                        class="icons"
+                        icon-class="timer"
+                        @click="moveItem(item, index, 'todoList', 'longTodoList')"
+                    /></span>
+                    <span title="删除"
+                      ><svg-icon
+                        class="icons"
+                        icon-class="delete"
+                        @click="delItem(item, index, 'todoList', false)"
+                    /></span>
+                  </span>
+                </div>
+              </li>
+            </transition-group>
+          </transition>
         </div>
 
         <div class="done-list-box">
           <div class="title">
             已完成
             <span class="items-sum">{{ doneList.length }}</span>
+            <span class="collection"
+              ><svg-icon
+                class="icons"
+                :class="{ rotate: !doneListVisible }"
+                icon-class="down"
+                @click="foldList('doneList')"
+            /></span>
           </div>
-
-          <transition-group
-            class="done-list"
-            v-if="doneList.length > 0"
-            name="list-anime2"
-            tag="ul"
-          >
-            <li class="items done-list-item" v-for="(item, index) in doneList" :key="item.id">
-              <span class="check">
-                <input
-                  type="checkbox"
-                  v-model="item.hasDone"
-                  @change="onDoneListItemCheckChange(item, index)"
-                />
-              </span>
-              <div class="content">
-                <span>{{ item.content }}</span>
-              </div>
-              <div class="collection">
-                <span class="time" title="完成日期">{{
-                  formatDate(new Date(item.doneTime), "yyyy-MM-dd hh:mm")
-                }}</span>
-                <span class="operations">
-                  <span title="删除"
-                    ><svg-icon
-                      class="icons"
-                      icon-class="delete"
-                      @click="delItem(item, index, 'doneList', false)"
-                  /></span>
+          <transition name="list-anime3">
+            <transition-group
+              class="done-list"
+              v-if="doneList.length > 0"
+              v-show="doneListVisible"
+              name="list-anime2"
+              tag="ul"
+            >
+              <li class="items done-list-item" v-for="(item, index) in doneList" :key="item.id">
+                <span class="check">
+                  <input
+                    type="checkbox"
+                    v-model="item.hasDone"
+                    @change="onDoneListItemCheckChange(item, index)"
+                  />
                 </span>
-              </div>
-            </li>
-          </transition-group>
+                <div class="content">
+                  <span>{{ item.content }}</span>
+                </div>
+                <div class="collection">
+                  <span class="time" title="完成日期">{{
+                    formatDate(new Date(item.doneTime), "yyyy-MM-dd hh:mm")
+                  }}</span>
+                  <span class="operations">
+                    <span title="删除"
+                      ><svg-icon
+                        class="icons"
+                        icon-class="delete"
+                        @click="delItem(item, index, 'doneList', false)"
+                    /></span>
+                  </span>
+                </div>
+              </li>
+            </transition-group>
+          </transition>
         </div>
 
         <div class="del-list-box">
           <div class="title" v-if="delList.length > 0">
             已删除
             <span class="items-sum">{{ delList.length }}</span>
+            <span class="collection"
+              ><svg-icon
+                class="icons"
+                :class="{ rotate: !delListVisible }"
+                icon-class="down"
+                @click="foldList('delList')"
+            /></span>
           </div>
-
-          <transition-group class="del-list" v-if="delList.length > 0" name="list-anime2" tag="ul">
-            <li class="items del-list-item" v-for="(item, index) in delList" :key="item.id">
-              <span class="check">
-                <input type="checkbox" v-model="item.hasDone" disabled />
-              </span>
-              <div class="content">
-                <del>{{ item.content }}</del>
-              </div>
-              <div class="collection">
-                <span class="time" title="删除日期">{{
-                  formatDate(new Date(item.delTime), "yyyy-MM-dd hh:mm")
-                }}</span>
-                <span class="operations">
-                  <span title="恢复项目"
-                    ><svg-icon class="icons" icon-class="return" @click="returnItem(item, index)"
-                  /></span>
-                  <span title="彻底删除"
-                    ><svg-icon
-                      class="icons"
-                      icon-class="delete"
-                      @click="delItem(item, index, 'delList', false)"
-                  /></span>
+          <transition name="list-anime3">
+            <transition-group
+              class="del-list"
+              v-if="delList.length > 0"
+              v-show="delListVisible"
+              name="list-anime2"
+              tag="ul"
+            >
+              <li class="items del-list-item" v-for="(item, index) in delList" :key="item.id">
+                <span class="check">
+                  <input type="checkbox" v-model="item.hasDone" disabled />
                 </span>
-              </div>
-            </li>
-          </transition-group>
+                <div class="content">
+                  <del>{{ item.content }}</del>
+                </div>
+                <div class="collection">
+                  <span class="time" title="删除日期">{{
+                    formatDate(new Date(item.delTime), "yyyy-MM-dd hh:mm")
+                  }}</span>
+                  <span class="operations">
+                    <span title="恢复项目"
+                      ><svg-icon class="icons" icon-class="return" @click="returnItem(item, index)"
+                    /></span>
+                    <span title="彻底删除"
+                      ><svg-icon
+                        class="icons"
+                        icon-class="delete"
+                        @click="delItem(item, index, 'delList', false)"
+                    /></span>
+                  </span>
+                </div>
+              </li>
+            </transition-group>
+          </transition>
         </div>
       </div>
       <div class="layouts layout-right"></div>
@@ -253,7 +295,11 @@ export default {
       todoList: [],
       longTodoList: [],
       doneList: [],
-      delList: [] // 已经删除的项
+      delList: [], // 已经删除的项
+      longTodoListVisible: true,
+      todoListVisible: true,
+      doneListVisible: true,
+      delListVisible: false
     };
   },
   watch: {
@@ -263,6 +309,7 @@ export default {
     todoList: {
       handler: function(val, oldVal) {
         localStorage.setItem("todoList", JSON.stringify(val));
+        this.initSortable();
       },
       deep: true
     },
@@ -275,6 +322,7 @@ export default {
     longTodoList: {
       handler: function(val, oldVal) {
         localStorage.setItem("longTodoList", JSON.stringify(val));
+        this.initSortable();
       },
       deep: true
     },
@@ -323,17 +371,22 @@ export default {
      */
     initSortable() {
       let _this = this;
-      console.log(
-        ": ",
-        document.querySelectorAll("#app > div > div.width-wrapper > div.layouts.layout-middle ul ")
-      );
+
       const el = document.querySelectorAll(
         "#app > div > div.width-wrapper > div.layouts.layout-middle > div.todo-list-box > ul "
       )[0];
+      const el2 = document.querySelectorAll(
+        "#app > div > div.width-wrapper > div.layouts.layout-left > div.long-todo-list-box > ul "
+      )[0];
 
-      setSortable(el, 'todoList');
+      if (el) {
+        setSortable(el, "todoList");
+      }
+      if (el2) {
+        setSortable(el2, "longTodoList");
+      }
 
-      function setSortable(el,listName) {
+      function setSortable(el, listName) {
         Sortable.create(el, {
           ghostClass: "list-item-sortable-ghost", // 拖拽时的class（可设置拖拽时的显示样式）
           scroll: true,
@@ -383,6 +436,12 @@ export default {
           break;
         }
       }
+    },
+    /**
+     * 折叠/展开列表
+     */
+    foldList(listName) {
+      this[listName + "Visible"] = !this[listName + "Visible"];
     },
     /**
      * 新增
@@ -516,6 +575,7 @@ $header-height: 50px;
 $borderRadius: 6px;
 $bgColor1: #abc;
 $textColor: #000;
+$textColor2: #555;
 
 /**列表变化样式 */
 // shuffle和排序的过渡动画只需要这个类设置
@@ -549,6 +609,16 @@ $textColor: #000;
   opacity: 0.3;
 }
 
+.list-anime3-enter-active,
+.list-anime3-leave-active {
+  transition: all 0.1s;
+}
+.list-anime3-enter,
+.list-anime3-leave-to {
+  transform: scale3d(0);
+  opacity: 1;
+}
+
 /**拖动样式 */
 .list-item-sortable-ghost {
   opacity: 0.3;
@@ -559,9 +629,7 @@ $textColor: #000;
 .CS-Todo {
   font-family: "Microsoft YaHei";
   font-size: 12px;
-  background: #efefef;
-  height: 100vh;
-  width: 100vw;
+  width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   ul {
@@ -648,7 +716,7 @@ $textColor: #000;
       line-height: 17px;
       font-size: 15px;
       font-weight: 600;
-      color: #555;
+      color: $textColor2;
       letter-spacing: 0.7px;
       .items-sum {
         display: inline-block;
@@ -664,12 +732,29 @@ $textColor: #000;
         background: $bgColor1;
         vertical-align: middle;
       }
+      .collection {
+        position: relative;
+        float: right;
+        overflow: hidden;
+        .icons {
+          font-size: 11px;
+          line-height: 11px;
+          color: $bgColor1;
+          transition: all 0.2s;
+          cursor: pointer;
+          &.rotate {
+            transform: rotate(180deg);
+          }
+        }
+      }
     }
 
     .todo-list,
     .done-list,
     .long-todo-list,
     .del-list {
+      transition: all 0.2s;
+
       .items {
         position: relative;
         margin: 10px auto;
