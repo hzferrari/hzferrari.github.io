@@ -46,12 +46,13 @@
                 :key="item.id"
               >
                 <span class="check">
-                  <input
-                    type="checkbox"
+                  <cs-checkbox
+                    class="inner"
                     v-model="item.hasDone"
                     @change="onTodoListItemCheckChange(item, index, 'longTodoList')"
-                  />
+                  ></cs-checkbox>
                 </span>
+
                 <div class="content" v-show="!item.isEdit" @click="onItemClick(item)">
                   <span>{{ item.content }}</span>
                 </div>
@@ -61,6 +62,7 @@
                   type="text"
                   v-model="item.content"
                   v-show="item.isEdit"
+                  @keydown="onListInputKeydown"
                   @blur="onItemInputBlur(item)"
                 />
                 <div class="collection">
@@ -127,13 +129,21 @@
                 v-for="(item, index) in todoList"
                 :key="item.id"
               >
-                <span class="check">
+                <!-- <span class="check">
                   <input
                     type="checkbox"
                     v-model="item.hasDone"
                     @change="onTodoListItemCheckChange(item, index, 'todoList')"
                   />
+                </span> -->
+                <span class="check">
+                  <cs-checkbox
+                    class="inner"
+                    v-model="item.hasDone"
+                    @change="onTodoListItemCheckChange(item, index, 'todoList')"
+                  ></cs-checkbox>
                 </span>
+
                 <div class="content" v-show="!item.isEdit" @click="onItemClick(item)">
                   <span>{{ item.content }}</span>
                 </div>
@@ -202,12 +212,19 @@
               tag="ul"
             >
               <li class="items done-list-item" v-for="(item, index) in doneList" :key="item.id">
-                <span class="check">
+                <!-- <span class="check">
                   <input
                     type="checkbox"
                     v-model="item.hasDone"
                     @change="onDoneListItemCheckChange(item, index)"
                   />
+                </span> -->
+                <span class="check">
+                  <cs-checkbox
+                    class="inner"
+                    v-model="item.hasDone"
+                    @change="onDoneListItemCheckChange(item, index)"
+                  ></cs-checkbox>
                 </span>
                 <div class="content">
                   <span>{{ item.content }}</span>
@@ -251,8 +268,11 @@
               tag="ul"
             >
               <li class="items del-list-item" v-for="(item, index) in delList" :key="item.id">
-                <span class="check">
+                <!-- <span class="check">
                   <input type="checkbox" v-model="item.hasDone" disabled />
+                </span> -->
+                <span class="check">
+                  <cs-checkbox class="inner" v-model="item.hasDone"></cs-checkbox>
                 </span>
                 <div class="content">
                   <del>{{ item.content }}</del>
@@ -285,10 +305,14 @@
 
 <script>
 import Sortable from "sortablejs";
+import CsCheckbox from "@/components/CheckBox";
 import util from "@/utils/util";
 
 export default {
   name: "CS-Todo",
+  components: {
+    CsCheckbox
+  },
   data() {
     return {
       todoInputingValue: "",
@@ -364,6 +388,16 @@ export default {
       if (e.keyCode === 13) {
         // 按下回车键
         this.add(e);
+      }
+    },
+    /**
+     * @event
+     * 列表里输入框按回车时，自动blur
+     */
+    onListInputKeydown(e) {
+      if (e.keyCode === 13) {
+        // 按下回车键
+        e.target.blur();
       }
     },
     /**
@@ -578,7 +612,6 @@ $textColor: #000;
 $textColor2: #555;
 
 /**列表变化样式 */
-// shuffle和排序的过渡动画只需要这个类设置
 .todo-list-item,
 .done-list-item,
 .del-list-item {
@@ -587,16 +620,15 @@ $textColor2: #555;
 // 下面是add和del的动画
 .list-anime1-enter-active,
 .list-anime1-leave-active {
-  transition: all 0.3s ease;
+  transition: transform 0.3s;
 }
 .list-anime1-enter,
 .list-anime1-leave-to {
-  transform: translate3d(-1000px, 0, 0);
-  opacity: 0.3;
+  transform: translate3d(-700px, 0, 0);
 }
 .list-anime1-leave-to {
-  // position: absolute !important;
-  // width: 100px !important;
+  position: absolute !important;
+  width: 150px !important;
 }
 
 .list-anime2-enter-active,
@@ -605,7 +637,7 @@ $textColor2: #555;
 }
 .list-anime2-enter,
 .list-anime2-leave-to {
-  transform: translate3d(1000px, 0, 0);
+  transform: translate3d(700px, 0, 0);
   opacity: 0.3;
 }
 
@@ -661,7 +693,7 @@ $textColor2: #555;
       font-size: 30px;
       font-weight: 700;
       color: #507f96;
-      text-shadow: 3px 2px 4px #efefef;
+      text-shadow: 1px 2px 0px #efefef;
       // text-align left;
     }
     .todo-input {
@@ -753,8 +785,6 @@ $textColor2: #555;
     .done-list,
     .long-todo-list,
     .del-list {
-      transition: all 0.2s;
-
       .items {
         position: relative;
         margin: 10px auto;
@@ -774,21 +804,20 @@ $textColor2: #555;
         }
         .check {
           display: inline-block;
-          width: 8%;
-          line-height: 10px;
-          input {
+          width: 7%;
+          // text-align: center;
+          .inner {
             display: block;
             margin: 0 auto;
-            // margin-left: 30%;
-            width: 18px;
-            height: 18px;
-            vertical-align: middle;
-            cursor: pointer;
+            margin-top: 8%;
+            width: 16px;
+            height: 16px;
           }
         }
         div.content {
           display: inline-block;
           width: 90%;
+          min-height: 20px;
           letter-spacing: 0.6px;
           cursor: pointer;
           word-break: break-all;
@@ -801,7 +830,7 @@ $textColor2: #555;
           line-height: 20px;
           span.time {
             display: inline-block;
-            margin-left: 8%;
+            margin-left: 7%;
             font-size: 9px;
             color: #ccc;
           }
@@ -861,7 +890,23 @@ $textColor2: #555;
     }
     .long-todo-list {
       .items {
+        .check {
+          width: 8%;
+          padding: 0 1% 0 2%;
+          .inner {
+            width: 15px;
+          }
+        }
+        div.content {
+          width: 80%;
+        }
+        input.edit-content {
+          width: 80%;
+        }
         .collection {
+          span.time {
+            margin-left: 11% !important;
+          }
           .icons.long-time {
             &:hover {
               transform: rotate(45deg) scale(1.5);
