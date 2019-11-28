@@ -153,6 +153,7 @@
                   type="text"
                   v-model="item.content"
                   v-show="item.isEdit"
+                  @keydown="onListInputKeydown"
                   @blur="onItemInputBlur(item)"
                 />
                 <div class="collection">
@@ -212,13 +213,6 @@
               tag="ul"
             >
               <li class="items done-list-item" v-for="(item, index) in doneList" :key="item.id">
-                <!-- <span class="check">
-                  <input
-                    type="checkbox"
-                    v-model="item.hasDone"
-                    @change="onDoneListItemCheckChange(item, index)"
-                  />
-                </span> -->
                 <span class="check">
                   <cs-checkbox
                     class="inner"
@@ -268,9 +262,6 @@
               tag="ul"
             >
               <li class="items del-list-item" v-for="(item, index) in delList" :key="item.id">
-                <!-- <span class="check">
-                  <input type="checkbox" v-model="item.hasDone" disabled />
-                </span> -->
                 <span class="check">
                   <cs-checkbox class="inner" v-model="item.hasDone"></cs-checkbox>
                 </span>
@@ -408,10 +399,10 @@ export default {
 
       const el = document.querySelectorAll(
         "#app > div > div.width-wrapper > div.layouts.layout-middle > div.todo-list-box > ul "
-      )[0];
+      )[0]; // todolist
       const el2 = document.querySelectorAll(
         "#app > div > div.width-wrapper > div.layouts.layout-left > div.long-todo-list-box > ul "
-      )[0];
+      )[0]; // longtodolist
 
       if (el) {
         setSortable(el, "todoList");
@@ -423,6 +414,8 @@ export default {
       function setSortable(el, listName) {
         Sortable.create(el, {
           ghostClass: "list-item-sortable-ghost", // 拖拽时的class（可设置拖拽时的显示样式）
+          filter: ".is-top-item", // 过滤掉置顶项
+          sort: true,
           scroll: true,
           scrollSpeed: 5, // px
           animation: 150,
@@ -432,6 +425,27 @@ export default {
             let newIndex = evt.newIndex;
             let oldIndex = evt.oldIndex;
 
+            // 更新数组
+            // 若移动的位置在置顶项中，将其放在非置顶项第一位
+            let topItemLen = _this[listName].length;
+            for (let i = 0; i < _this[listName].length; i++) {
+              if (!_this[listName][i].isTop) {
+                topItemLen = i;
+                break;
+              }
+            }
+            if (newIndex < topItemLen) {
+              newIndex = topItemLen;
+
+              // 改变了newIndex的情况下，需要这样写DOM才会更新
+              let tpm = _this[listName].splice(oldIndex, 1);
+              _this.$nextTick(() => {
+                _this[listName].splice(newIndex, 0, tpm[0]);
+              });
+            } else {
+              let tpm = _this[listName].splice(oldIndex, 1);
+              _this[listName].splice(newIndex, 0, tpm[0]);
+            }
             // 删除移动过的节点，并还原其位置(产生移动动画效果)
             // let newChild = el.children[newIndex];
             // let oldChild = el.children[oldIndex];
@@ -441,11 +455,6 @@ export default {
             // } else {
             //   el.insertBefore(newChild, oldChild.nextSibling);
             // }
-
-            // 更新数组
-            let tpm = _this[listName].splice(oldIndex, 1);
-            _this[listName].splice(newIndex, 0, tpm[0]);
-            // Vue下一个tick就会走patch更新DOM
           }
         });
       }
@@ -797,7 +806,6 @@ $textColor2: #555;
         color: $textColor;
         border-radius: $borderRadius;
         &:hover {
-          cursor: move;
           .operations {
             opacity: 1 !important;
           }
@@ -819,7 +827,6 @@ $textColor2: #555;
           width: 90%;
           min-height: 20px;
           letter-spacing: 0.6px;
-          cursor: pointer;
           word-break: break-all;
           vertical-align: top;
         }
@@ -862,20 +869,6 @@ $textColor2: #555;
             }
           }
         }
-        input.edit-content {
-          padding: 2px;
-          width: 90%;
-          height: 26px;
-          line-height: 26px;
-          // min-height: 60%;
-          background-color: rgba(255, 255, 255, 0.1);
-          border: 1px solid #ddd;
-          border-radius: $borderRadius;
-          box-sizing: border-box;
-          &:focus {
-            outline: none;
-          }
-        }
       }
     }
 
@@ -883,8 +876,30 @@ $textColor2: #555;
     .long-todo-list {
       .items {
         background: #fff;
+        &:hover {
+          cursor: move;
+        }
         &.is-top-item {
           background: #f9ffbd;
+          &:hover {
+            cursor: default;
+          }
+        }
+        div.content {
+          cursor: pointer;
+        }
+        input.edit-content {
+          padding: 2px;
+          width: 90%;
+          height: 26px;
+          line-height: 26px;
+          background-color: rgba(255, 255, 255, 0.1);
+          border: 1px solid #ddd;
+          border-radius: $borderRadius;
+          box-sizing: border-box;
+          &:focus {
+            outline: none;
+          }
         }
       }
     }
