@@ -1,13 +1,7 @@
 <template>
-  <div class="cs-checkbox">
+  <div class="cs-checkbox" @click="toggle">
     <span class="box-wrapper" ref="csCheckbox">
-      <span
-        class="inner-box"
-        :class="{ 'cs-checkbox-checked': isChecked }"
-        :value="value"
-        @click="toggle"
-      >
-      </span>
+      <span class="inner-box" :class="{ 'cs-checkbox-checked': isChecked }" :value="value"> </span>
     </span>
   </div>
 </template>
@@ -74,7 +68,7 @@ $borderRadius: 50%;
     .inner-box {
       position: absolute;
       display: inline-block;
-      margin: 15%;
+      margin: 15.5%;
       width: 70%;
       height: 70%;
       border-radius: $borderRadius;

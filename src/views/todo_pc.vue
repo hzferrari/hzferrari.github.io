@@ -1,5 +1,6 @@
 <template>
   <div class="CS-Todo">
+    <div id="scroll-anchor"></div>
     <div class="header">
       <div class="width-wrapper">
         <span class="title">
@@ -41,7 +42,7 @@
             >
               <li
                 class="items todo-list-item"
-                :class="{ 'is-top-item': item.isTop }"
+                :class="{ 'is-top-item': item.isTop, 'un-top-item': !item.isTop }"
                 v-for="(item, index) in longTodoList"
                 :key="item.id"
               >
@@ -85,13 +86,13 @@
                     <span title="移至普通事项"
                       ><svg-icon
                         class="icons long-time"
-                        icon-class="timer"
+                        icon-class="wave"
                         @click="moveItem(item, index, 'longTodoList', 'todoList')"
                     /></span>
                     <span title="删除"
                       ><svg-icon
                         class="icons"
-                        icon-class="delete"
+                        icon-class="cross"
                         @click="delItem(item, index, 'longTodoList', false)"
                     /></span>
                   </span>
@@ -125,17 +126,10 @@
             >
               <li
                 class="items todo-list-item"
-                :class="{ 'is-top-item': item.isTop }"
+                :class="{ 'is-top-item': item.isTop, 'un-top-item': !item.isTop }"
                 v-for="(item, index) in todoList"
                 :key="item.id"
               >
-                <!-- <span class="check">
-                  <input
-                    type="checkbox"
-                    v-model="item.hasDone"
-                    @change="onTodoListItemCheckChange(item, index, 'todoList')"
-                  />
-                </span> -->
                 <span class="check">
                   <cs-checkbox
                     class="inner"
@@ -176,13 +170,13 @@
                     <span title="长期事项"
                       ><svg-icon
                         class="icons"
-                        icon-class="timer"
+                        icon-class="wave"
                         @click="moveItem(item, index, 'todoList', 'longTodoList')"
                     /></span>
                     <span title="删除"
                       ><svg-icon
                         class="icons"
-                        icon-class="delete"
+                        icon-class="cross"
                         @click="delItem(item, index, 'todoList', false)"
                     /></span>
                   </span>
@@ -196,8 +190,11 @@
           <div class="title">
             已完成
             <span class="items-sum">{{ doneList.length }}</span>
-            <span class="collection"
-              ><svg-icon
+            <span class="collection">
+              <span title="删除所有">
+                <svg-icon class="icons" icon-class="delete" @click="delAllDoneItem()"
+              /></span>
+              <svg-icon
                 class="icons"
                 :class="{ rotate: !doneListVisible }"
                 icon-class="down"
@@ -231,7 +228,7 @@
                     <span title="删除"
                       ><svg-icon
                         class="icons"
-                        icon-class="delete"
+                        icon-class="cross"
                         @click="delItem(item, index, 'doneList', false)"
                     /></span>
                   </span>
@@ -245,8 +242,11 @@
           <div class="title" v-if="delList.length > 0">
             已删除
             <span class="items-sum">{{ delList.length }}</span>
-            <span class="collection"
-              ><svg-icon
+            <span class="collection">
+              <span title="彻底删除所有"
+                ><svg-icon class="icons" icon-class="delete" @click="delAllDelItem()"
+              /></span>
+              <svg-icon
                 class="icons"
                 :class="{ rotate: !delListVisible }"
                 icon-class="down"
@@ -272,6 +272,9 @@
                   <span class="time" title="删除日期">{{
                     formatDate(new Date(item.delTime), "yyyy-MM-dd hh:mm")
                   }}</span>
+                  <span class="auto-del-hints">
+                    此条项目将在{{ item.autoDelDay }}天后自动删除
+                  </span>
                   <span class="operations">
                     <span title="恢复项目"
                       ><svg-icon class="icons" icon-class="return" @click="returnItem(item, index)"
@@ -279,7 +282,7 @@
                     <span title="彻底删除"
                       ><svg-icon
                         class="icons"
-                        icon-class="delete"
+                        icon-class="cross"
                         @click="delItem(item, index, 'delList', false)"
                     /></span>
                   </span>
@@ -314,7 +317,8 @@ export default {
       longTodoListVisible: true,
       todoListVisible: true,
       doneListVisible: true,
-      delListVisible: false
+      delListVisible: false,
+      delListAutoDelDay: 30 // x天自动删除
     };
   },
   watch: {
@@ -353,6 +357,13 @@ export default {
     this.recoverData("doneList");
     this.recoverData("longTodoList");
     this.recoverData("delList");
+
+    this.recoverFoldState("todoList");
+    this.recoverFoldState("doneList");
+    this.recoverFoldState("longTodoList");
+    this.recoverFoldState("delList");
+
+    this.autoDel();
   },
   mounted() {
     this.initSortable();
@@ -414,7 +425,7 @@ export default {
       function setSortable(el, listName) {
         Sortable.create(el, {
           ghostClass: "list-item-sortable-ghost", // 拖拽时的class（可设置拖拽时的显示样式）
-          filter: ".is-top-item", // 过滤掉置顶项
+          draggable: ".un-top-item", // 允许拖拽的项
           sort: true,
           scroll: true,
           scrollSpeed: 5, // px
@@ -426,7 +437,7 @@ export default {
             let oldIndex = evt.oldIndex;
 
             // 更新数组
-            // 若移动的位置在置顶项中，将其放在非置顶项第一位
+            // 若移动的位置在置顶项中，将其放在非置顶项第一位(设置了draggable参数则不需要自行处理这个！！)
             let topItemLen = _this[listName].length;
             for (let i = 0; i < _this[listName].length; i++) {
               if (!_this[listName][i].isTop) {
@@ -485,6 +496,19 @@ export default {
      */
     foldList(listName) {
       this[listName + "Visible"] = !this[listName + "Visible"];
+      localStorage.setItem(listName + "Visible", this[listName + "Visible"]);
+    },
+    /**
+     * 从local恢复列表折叠状态
+     */
+    recoverFoldState(listName) {
+      let flag = localStorage.getItem(listName + "Visible");
+
+      if (flag === "true") {
+        this[listName + "Visible"] = true;
+      } else if (flag === "false") {
+        this[listName + "Visible"] = false;
+      }
     },
     /**
      * 新增
@@ -502,6 +526,8 @@ export default {
           doneTime: -1,
           delTime: -1
         };
+
+        document.querySelector("#scroll-anchor").scrollIntoView({ behavior: "instant" });
 
         // 插入在非置顶项的第一个
         this.insertItemUnderTop(o, "todoList");
@@ -541,7 +567,7 @@ export default {
      */
     onDoneListItemCheckChange(item, index) {
       if (item.hasDone === true) return;
-
+      item.isTop = false;
       let tmp = this.doneList.splice(index, 1)[0];
 
       this.insertItemUnderTop(tmp, "todoList");
@@ -606,6 +632,45 @@ export default {
       } else {
         this.insertItemUnderTop(tmp, "doneList");
       }
+    },
+    /**
+     * 移除所有已完成项目到已删除
+     */
+    delAllDoneItem() {
+      let cf = confirm(`确认要将所有【已完成】项移到【已删除】吗？`);
+      if (cf) {
+        this.delList = Array.prototype.concat.apply([], [this.doneList, this.delList]);
+        this.doneList = [];
+      }
+    },
+    /**
+     * 彻底删除所有已删除项目
+     */
+    delAllDelItem() {
+      let cf = confirm(`确认要将所有【已删除】项彻底删除吗？`);
+      if (cf) {
+        this.delList = [];
+      }
+    },
+    /**
+     * 检测自动删除项目
+     * 超过delListAutoDelDay后自动删除（只看日期，不看具体小时分钟）
+     */
+    autoDel() {
+      if (!this.delList || this.delList.length === 0) reutrn;
+
+      let today = new Date().getTime();
+      let newList = [];
+      this.delList.forEach(v => {
+        // 计算删除日期到今天的相差天数，向下取整
+        let diff = Math.floor((new Date() - new Date(v.delTime)) / 60 / 60 / 24 / 1000);
+        // console.log("v.diff: ", diff);
+        if (diff < this.delListAutoDelDay) {
+          v.autoDelDay = this.delListAutoDelDay - diff;
+          newList.push(v);
+        }
+      });
+      this.delList = newList;
     }
   }
 };
@@ -624,12 +689,12 @@ $textColor2: #555;
 .todo-list-item,
 .done-list-item,
 .del-list-item {
-  transition: all 0.3s;
+  transition: all 0.15s;
 }
 // 下面是add和del的动画
 .list-anime1-enter-active,
 .list-anime1-leave-active {
-  transition: transform 0.3s;
+  transition: transform 0.15s;
 }
 .list-anime1-enter,
 .list-anime1-leave-to {
@@ -642,7 +707,7 @@ $textColor2: #555;
 
 .list-anime2-enter-active,
 .list-anime2-leave-active {
-  transition: all 0.5s ease;
+  transition: all 0.15s ease;
 }
 .list-anime2-enter,
 .list-anime2-leave-to {
@@ -652,7 +717,7 @@ $textColor2: #555;
 
 .list-anime3-enter-active,
 .list-anime3-leave-active {
-  transition: all 0.1s;
+  transition: all 0.15s;
 }
 .list-anime3-enter,
 .list-anime3-leave-to {
@@ -671,8 +736,7 @@ $textColor2: #555;
   font-family: "Microsoft YaHei";
   font-size: 12px;
   width: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+  // overflow-x: hidden;
   ul {
     list-style: none;
     padding: 0;
@@ -685,12 +749,15 @@ $textColor2: #555;
     margin: 0 auto;
   }
   .header {
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     background: $bgColor1;
     height: $header-height;
     line-height: $header-height;
     text-align: center;
+    z-index: 100;
     .title,
     .todo-input,
     .todo-input-right-space {
@@ -728,6 +795,7 @@ $textColor2: #555;
   .layouts {
     display: inline-block;
     vertical-align: top;
+    margin-top: $header-height;
     &.layout-left,
     &.layout-right {
       width: 30%;
@@ -778,8 +846,9 @@ $textColor2: #555;
         float: right;
         overflow: hidden;
         .icons {
-          font-size: 11px;
-          line-height: 11px;
+          margin-left: 15px;
+          font-size: 13px;
+          line-height: 13px;
           color: $bgColor1;
           transition: all 0.2s;
           cursor: pointer;
@@ -889,13 +958,17 @@ $textColor2: #555;
           cursor: pointer;
         }
         input.edit-content {
-          padding: 2px;
+          // padding: 2px;
+          position: absolute;
+          top: 5px;
+          // margin-top: -15px;
           width: 90%;
           height: 26px;
           line-height: 26px;
+          font-size: 13px;
           background-color: rgba(255, 255, 255, 0.1);
-          border: 1px solid #ddd;
-          border-radius: $borderRadius;
+          border: none;
+          border-bottom: 1px solid #ddd;
           box-sizing: border-box;
           &:focus {
             outline: none;
@@ -924,7 +997,8 @@ $textColor2: #555;
           }
           .icons.long-time {
             &:hover {
-              transform: rotate(45deg) scale(1.5);
+              // transform: rotate(45deg) scale(1.5);
+              transform: scale(1.5);
             }
           }
         }
@@ -935,6 +1009,13 @@ $textColor2: #555;
       .items {
         background: #eaeaea;
         color: #848484;
+        .collection {
+          .auto-del-hints {
+            margin-left: 10px;
+            font-size: 8px;
+            color: #f96e6e;
+          }
+        }
       }
     }
   }

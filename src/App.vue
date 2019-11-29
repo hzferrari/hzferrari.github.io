@@ -3,7 +3,9 @@
     <todoPC />
     <!-- <icons /> -->
 
-    <div style="text-align:center;margin-top:50px;">Copyright © 2019 ~Chriz~</div>
+    <div style="text-align:center;padding:50px 0 30px 0;font-size:12px;color:#555;">
+      Copyright © 2019 <span style="font-style:italic">hzferrari@qq.com</span>
+    </div>
   </div>
 </template>
 
@@ -25,6 +27,7 @@ body,
 html {
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
@@ -34,6 +37,5 @@ html {
   background: #efefef;
   min-height: 100vh;
   width: 100vw;
-  overflow-x: hidden;
 }
 </style>
