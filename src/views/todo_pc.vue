@@ -981,14 +981,13 @@ $textColor2: #555;
           cursor: pointer;
         }
         input.edit-content {
-          // padding: 2px;
           position: absolute;
           top: 5px;
-          // margin-top: -15px;
           width: 90%;
           height: 26px;
           line-height: 26px;
           font-size: 13px;
+          letter-spacing: 0.6px;
           background-color: rgba(255, 255, 255, 0.1);
           border: none;
           border-bottom: 1px solid #ddd;

@@ -4,9 +4,17 @@
     <!-- <icons /> -->
 
     <div style="text-align:center;padding:50px 0 30px 0;font-size:12px;color:#555;">
-      Copyright © 2019
-      <span style="font-style:italic">hzferrari@qq.com </span
-      ><span class="version">-beta v0.1.1-</span>
+      <p>
+        <span class="version"
+          ><svg-icon
+            style="cursor:pointer;font-size:20px;"
+            class="icons"
+            icon-class="github"
+            @click="gotoGithub"
+          /> beta 0.1.2 </span
+        >
+      </p>
+      <p>Copyright © 2019 <span style="font-style:italic">hzferrari@qq.com </span></p>
     </div>
   </div>
 </template>
@@ -20,6 +28,11 @@ export default {
   components: {
     todoPC,
     icons
+  },
+  methods: {
+    gotoGithub() {
+      window.open("https://github.com/hzferrari/hzferrari.github.io", "_blank");
+    }
   }
 };
 </script>
