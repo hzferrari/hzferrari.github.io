@@ -657,7 +657,7 @@ export default {
      * 超过delListAutoDelDay后自动删除（只看日期，不看具体小时分钟）
      */
     autoDel() {
-      if (!this.delList || this.delList.length === 0) reutrn;
+      if (!this.delList || this.delList.length === 0) return;
 
       let today = new Date().getTime();
       let newList = [];
