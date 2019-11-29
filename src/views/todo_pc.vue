@@ -10,6 +10,7 @@
         <span class="todo-input">
           <input
             v-model="todoInputingValue"
+            :maxlength="maxInputLen"
             type="text"
             placeholder="按下Enter，添加todo"
             autocomplete="off"
@@ -62,6 +63,7 @@
                   :ref="item.id"
                   class="edit-content"
                   type="text"
+                  :maxlength="maxInputLen"
                   v-model="item.content"
                   v-show="item.isEdit"
                   @keydown="onListInputKeydown"
@@ -146,6 +148,7 @@
                   :ref="item.id"
                   class="edit-content"
                   type="text"
+                  :maxlength="maxInputLen"
                   v-model="item.content"
                   v-show="item.isEdit"
                   @keydown="onListInputKeydown"
@@ -319,7 +322,8 @@ export default {
       todoListVisible: true,
       doneListVisible: true,
       delListVisible: false,
-      delListAutoDelDay: 30 // x天自动删除
+      delListAutoDelDay: 30, // x天自动删除
+      maxInputLen: 500 // 输入框文本限制长度
     };
   },
   watch: {
@@ -778,7 +782,7 @@ $textColor2: #555;
       font-weight: 700;
       color: #507f96;
       text-shadow: 1px 2px 0px #efefef;
-    
+
       // .version {
       //   position: absolute;
       //   top: 0;
