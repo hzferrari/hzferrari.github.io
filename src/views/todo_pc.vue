@@ -5,6 +5,7 @@
       <div class="width-wrapper">
         <span class="title">
           Todo-list
+          <!-- <span class="version">Beta v0.1.1</span> -->
         </span>
         <span class="todo-input">
           <input
@@ -272,7 +273,7 @@
                   <span class="time" title="删除日期">{{
                     formatDate(new Date(item.delTime), "yyyy-MM-dd hh:mm")
                   }}</span>
-                  <span class="auto-del-hints">
+                  <span class="auto-del-hints" v-if="item.autoDelDay && item.autoDelDay <= 10">
                     此条项目将在{{ item.autoDelDay }}天后自动删除
                   </span>
                   <span class="operations">
@@ -619,6 +620,7 @@ export default {
 
       if (listName !== "delList") {
         tmp.delTime = new Date().getTime();
+        tmp.autoDelDay = this.delListAutoDelDay - this.calDIffDay(tmp.delTime);
         this.delList.unshift(tmp);
       }
     },
@@ -662,8 +664,7 @@ export default {
       let today = new Date().getTime();
       let newList = [];
       this.delList.forEach(v => {
-        // 计算删除日期到今天的相差天数，向下取整
-        let diff = Math.floor((new Date() - new Date(v.delTime)) / 60 / 60 / 24 / 1000);
+        let diff = this.calDIffDay(v.delTime);
         // console.log("v.diff: ", diff);
         if (diff < this.delListAutoDelDay) {
           v.autoDelDay = this.delListAutoDelDay - diff;
@@ -671,6 +672,12 @@ export default {
         }
       });
       this.delList = newList;
+    },
+    /**
+     * // 计算日期到今天的相差天数，向下取整
+     */
+    calDIffDay(timeStamp) {
+      return Math.floor((new Date() - new Date(timeStamp)) / 60 / 60 / 24 / 1000);
     }
   }
 };
@@ -766,11 +773,27 @@ $textColor2: #555;
       width: 33%;
     }
     .title {
+      position: relative;
       font-size: 30px;
       font-weight: 700;
       color: #507f96;
       text-shadow: 1px 2px 0px #efefef;
-      // text-align left;
+    
+      // .version {
+      //   position: absolute;
+      //   top: 0;
+      //   right: 0;
+      //   display: inline-block;
+      //   height: 20px;
+      //   line-height: 15px;
+      //   width: 20px;
+      //   background: #f9ffbd;
+      //   border-radius: $borderRadius;
+      //   color: #555;
+      //   font-size: 8px;
+      //   font-weight: 300;
+      //   text-shadow: none;
+      // }
     }
     .todo-input {
       margin: 0 auto;

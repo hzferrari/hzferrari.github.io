@@ -4,7 +4,9 @@
     <!-- <icons /> -->
 
     <div style="text-align:center;padding:50px 0 30px 0;font-size:12px;color:#555;">
-      Copyright © 2019 <span style="font-style:italic">hzferrari@qq.com</span>
+      Copyright © 2019
+      <span style="font-style:italic">hzferrari@qq.com </span
+      ><span class="version">-beta v0.1.1-</span>
     </div>
   </div>
 </template>
