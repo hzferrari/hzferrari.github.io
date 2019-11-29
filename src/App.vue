@@ -11,8 +11,9 @@
             class="icons"
             icon-class="github"
             @click="gotoGithub"
-          /> beta 0.1.2 </span
-        >
+          />
+          beta 0.1.2
+        </span>
       </p>
       <p>Copyright © 2019 <span style="font-style:italic">hzferrari@qq.com </span></p>
     </div>
@@ -42,7 +43,6 @@ body,
 html {
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
 }
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
@@ -50,7 +50,9 @@ html {
   -moz-osx-font-smoothing: grayscale;
 
   background: #efefef;
-  min-height: 100vh;
-  width: 100vw;
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 </style>
