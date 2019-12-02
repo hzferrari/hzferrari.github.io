@@ -990,7 +990,6 @@ $textColor2: #555;
           width: 90%;
           height: 26px;
           line-height: 26px;
-          font-family: "Microsoft YaHei";
           font-size: 13px;
           letter-spacing: 0.6px;
           background-color: rgba(255, 255, 255, 0.1);
