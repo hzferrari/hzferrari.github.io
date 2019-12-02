@@ -743,6 +743,14 @@ $textColor2: #555;
   background: $bgColor1 !important;
 }
 
+@mixin input-style {
+  font-family: "Microsoft YaHei";
+  letter-spacing: 0.6px;
+  &:focus {
+    outline: none;
+  }
+}
+
 .CS-Todo {
   font-family: "Microsoft YaHei";
   font-size: 12px;
@@ -805,17 +813,13 @@ $textColor2: #555;
       line-height: $header-height;
       vertical-align: top;
       input {
-        padding: 0 10px;
-        border: 1px solid #ccc;
+        @include input-style;
         height: 30px;
         width: 96%;
+        padding: 0 10px;
+        border: 1px solid #ccc;
         border-radius: $borderRadius;
-        font-family: "Microsoft YaHei";
-        letter-spacing: 0.6px;
         font-size: 12px;
-        &:focus {
-          outline: none;
-        }
       }
     }
   }
@@ -985,20 +989,17 @@ $textColor2: #555;
           cursor: pointer;
         }
         input.edit-content {
+          @include input-style;
           position: absolute;
           top: 5px;
           width: 90%;
           height: 26px;
           line-height: 26px;
-          font-size: 13px;
-          letter-spacing: 0.6px;
           background-color: rgba(255, 255, 255, 0.1);
           border: none;
           border-bottom: 1px solid #ddd;
           box-sizing: border-box;
-          &:focus {
-            outline: none;
-          }
+          font-size: 13px;
         }
       }
     }
