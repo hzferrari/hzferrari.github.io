@@ -6,6 +6,7 @@ function resolve(dir) {
 module.exports = {
   publicPath: "/", // 设置打包文件相对路径
   outputDir: "dist",
+  assetsDir: 'dist',
   lintOnSave: false,
   productionSourceMap: false,
   devServer: {
