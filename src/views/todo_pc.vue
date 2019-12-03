@@ -56,19 +56,15 @@
                   ></cs-checkbox>
                 </span>
 
-                <div class="content" v-show="!item.isEdit" @click="onItemClick(item)">
-                  <span>{{ item.content }}</span>
-                </div>
-                <input
-                  :ref="item.id"
-                  class="edit-content"
-                  type="text"
-                  :maxlength="maxInputLen"
+                <cs-edit-input
+                  class="editor"
                   v-model="item.content"
-                  v-show="item.isEdit"
-                  @keydown="onListInputKeydown"
+                  :id="item.id"
+                  :isEdit="item.isEdit"
+                  @click="onItemClick(item)"
                   @blur="onItemInputBlur(item)"
-                />
+                ></cs-edit-input>
+
                 <div class="collection">
                   <span class="time" title="创建日期">{{
                     formatDate(new Date(item.createTime), "yyyy-MM-dd hh:mm")
@@ -141,19 +137,15 @@
                   ></cs-checkbox>
                 </span>
 
-                <div class="content" v-show="!item.isEdit" @click="onItemClick(item)">
-                  <span>{{ item.content }}</span>
-                </div>
-                <input
-                  :ref="item.id"
-                  class="edit-content"
-                  type="text"
-                  :maxlength="maxInputLen"
+                <cs-edit-input
+                  class="editor"
                   v-model="item.content"
-                  v-show="item.isEdit"
-                  @keydown="onListInputKeydown"
+                  :id="item.id"
+                  :isEdit="item.isEdit"
+                  @click="onItemClick(item)"
                   @blur="onItemInputBlur(item)"
-                />
+                ></cs-edit-input>
+
                 <div class="collection">
                   <span class="time" title="创建日期">{{
                     formatDate(new Date(item.createTime), "yyyy-MM-dd hh:mm")
@@ -304,12 +296,14 @@
 <script>
 import Sortable from "sortablejs";
 import CsCheckbox from "@/components/CheckBox";
+import CsEditInput from "@/components/CsEditInput";
 import util from "@/utils/util";
 
 export default {
   name: "CS-Todo",
   components: {
-    CsCheckbox
+    CsCheckbox,
+    CsEditInput
   },
   data() {
     return {
@@ -387,6 +381,10 @@ export default {
       } else {
         this[listName] = [];
       }
+      // 编辑状态全部置为false
+      this[listName].forEach(v => {
+        v.isEdit = false;
+      });
     },
     /**
      * @event
@@ -397,16 +395,7 @@ export default {
         this.add(e);
       }
     },
-    /**
-     * @event
-     * 列表里输入框按回车时，自动blur
-     */
-    onListInputKeydown(e) {
-      if (e.keyCode === 13) {
-        // 按下回车键
-        e.target.blur();
-      }
-    },
+
     /**
      *  初始化拖拽
      */
@@ -545,11 +534,6 @@ export default {
      */
     onItemClick(item) {
       item.isEdit = true;
-      // console.log("this.$refs[item.id]: ", this.$refs[item.id][0]);
-
-      this.$nextTick(() => {
-        this.$refs[item.id][0].focus();
-      });
     },
     /**
      * 编辑项blur时
@@ -746,9 +730,6 @@ $textColor2: #555;
 @mixin input-style {
   font-family: "Microsoft YaHei";
   letter-spacing: 0.6px;
-  &:focus {
-    outline: none;
-  }
 }
 
 .CS-Todo {
@@ -988,18 +969,10 @@ $textColor2: #555;
         div.content {
           cursor: pointer;
         }
-        input.edit-content {
+        .editor {
           @include input-style;
-          position: absolute;
-          top: 5px;
           width: 90%;
-          height: 26px;
-          line-height: 26px;
-          background-color: rgba(255, 255, 255, 0.1);
-          border: none;
-          border-bottom: 1px solid #ddd;
-          box-sizing: border-box;
-          font-size: 13px;
+          vertical-align: top;
         }
       }
     }
@@ -1015,7 +988,7 @@ $textColor2: #555;
         div.content {
           width: 80%;
         }
-        input.edit-content {
+        .editor {
           width: 80%;
         }
         .collection {
