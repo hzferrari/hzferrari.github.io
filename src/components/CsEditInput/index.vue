@@ -97,10 +97,12 @@ export default {
       } else if (window.clipboardData && window.clipboardData.getData) {
         text = window.clipboardData.getData("Text");
       }
+      
+      // 将换行符替换为空格，否则有bug
+      text = text.replace(/\r\n/g, " ");
 
       document.execCommand("insertText", false, text);
     },
-
     /**
      * 点击时，自动focus并移动光标到尾部
      */
@@ -121,7 +123,7 @@ export default {
      */
     onBlur(item) {
       this.content = this.$refs["input" + this.id].innerText;
-      
+
       this.$emit("blur");
     },
     /**
@@ -151,6 +153,7 @@ export default {
     padding: 3px 0;
     line-height: 26px;
     min-height: 26px; // 若不设置，没有内容时无法点击
+    word-break: break-all;
     &:focus {
       outline: none;
     }
