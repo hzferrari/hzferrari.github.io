@@ -236,7 +236,7 @@
 
         <div class="del-list-box">
           <div class="title" v-if="delList.length > 0">
-            已删除
+            <span title="事项删除30天后将被自动移除">已删除</span>
             <span class="items-sum">{{ delList.length }}</span>
             <span class="collection">
               <span title="彻底删除所有"
@@ -395,7 +395,6 @@ export default {
         this.add(e);
       }
     },
-
     /**
      *  初始化拖拽
      */
