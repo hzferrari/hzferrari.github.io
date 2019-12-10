@@ -1,0 +1,4 @@
+build发布方式：
+1.npm run build
+2.将/dist/dist中的js和css文件夹剪切到/dist中
+3.将index.html中<link rel=icon href=/favicon.ico>改为<link rel=icon href=/dist/favicon.ico>
