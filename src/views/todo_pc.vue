@@ -409,13 +409,15 @@ export default {
       )[0]; // longtodolist
 
       if (el) {
-        setSortable(el, "todoList");
+        setUntopItemSortable(el, "todoList");
+        setTopItemSortable(el, "todoList");
       }
       if (el2) {
-        setSortable(el2, "longTodoList");
+        setUntopItemSortable(el2, "longTodoList");
+        setTopItemSortable(el2, "longTodoList");
       }
 
-      function setSortable(el, listName) {
+      function setUntopItemSortable(el, listName) {
         Sortable.create(el, {
           ghostClass: "list-item-sortable-ghost", // 拖拽时的class（可设置拖拽时的显示样式）
           draggable: ".un-top-item", // 允许拖拽的项
@@ -429,8 +431,7 @@ export default {
             let newIndex = evt.newIndex;
             let oldIndex = evt.oldIndex;
 
-            // 更新数组
-            // 若移动的位置在置顶项中，将其放在非置顶项第一位(设置了draggable参数则不需要自行处理这个！！)
+            // 更新数组。若移动的位置在置顶项中，将其放在非置顶项第一位(设置了draggable参数则不需要自行处理这个！！)
             let topItemLen = _this[listName].length;
             for (let i = 0; i < _this[listName].length; i++) {
               if (!_this[listName][i].isTop) {
@@ -459,6 +460,26 @@ export default {
             // } else {
             //   el.insertBefore(newChild, oldChild.nextSibling);
             // }
+          }
+        });
+      }
+
+      function setTopItemSortable(el, listName) {
+        Sortable.create(el, {
+          ghostClass: "list-item-sortable-ghost", // 拖拽时的class（可设置拖拽时的显示样式）
+          draggable: ".is-top-item", // 允许拖拽的项
+          sort: true,
+          scroll: true,
+          scrollSpeed: 5, // px
+          animation: 150,
+          scrollSensitivity: 30,
+          onUpdate: evt => {
+            // sortable改变了真实DOM的排序后,在回调函数里还原移动过的DOM（避免和Vue自带的DOM操作冲突）
+            let newIndex = evt.newIndex;
+            let oldIndex = evt.oldIndex;
+
+            let tpm = _this[listName].splice(oldIndex, 1);
+            _this[listName].splice(newIndex, 0, tpm[0]);
           }
         });
       }
