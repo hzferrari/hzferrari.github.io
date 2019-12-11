@@ -17,7 +17,10 @@
             @keydown="onTodoInputKeydown"
           />
         </span>
-        <span class="todo-input-right-space"></span>
+        <span class="todo-input-right-space">
+          <export-data-btn></export-data-btn>
+          <import-data-btn></import-data-btn>
+        </span>
       </div>
     </div>
     <div class="width-wrapper">
@@ -295,15 +298,19 @@
 
 <script>
 import Sortable from "sortablejs";
+import util from "@/utils/util";
 import CsCheckbox from "@/components/CheckBox";
 import CsEditInput from "@/components/CsEditInput";
-import util from "@/utils/util";
+import exportDataBtn from "@/components/exportData/exportBtn";
+import importDataBtn from "@/components/exportData/importBtn";
 
 export default {
   name: "CS-Todo",
   components: {
     CsCheckbox,
-    CsEditInput
+    CsEditInput,
+    exportDataBtn,
+    importDataBtn
   },
   data() {
     return {

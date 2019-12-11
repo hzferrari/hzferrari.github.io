@@ -1,0 +1,51 @@
+<template>
+  <div class="import-data-btn">
+    <span class="btn" @click="importDataFromJson">从本地导入数据</span>
+    <input style="display:none;" ref="importInput" type="file" @change="onFileChange" />
+  </div>
+</template>
+
+<script>
+import util from "@/utils/util";
+
+export default {
+  name: "import-data-btn",
+  components: {},
+  props: {},
+  data() {
+    return {};
+  },
+
+  created() {},
+  mounted() {},
+  methods: {
+    importDataFromJson() {
+      this.$refs.importInput.click();
+    },
+    onFileChange(e) {
+      let file = e.target.files[0];
+      // console.log("file: ", file);
+      // console.log(": ", this.$refs.importInput.files);
+      var reader = new FileReader();
+      reader.readAsText(file);
+
+      reader.onload = function(evt) {
+        let result = evt.target.result
+        console.log("读取结果：", result);
+
+        console.log("读取结果转为JSON：");
+        let json = JSON.parse(result);
+      };
+    }
+  }
+};
+</script>
+
+<style scoped lang="scss">
+.import-data-btn {
+  display: inline-block;
+  .btn {
+    cursor: pointer;
+  }
+}
+</style>
