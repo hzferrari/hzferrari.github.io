@@ -20,17 +20,16 @@ export default {
   methods: {
     saveDataAsJson() {
       let data = {
-        todoList: this.getLocalData("todoList"),
-        doneList: this.getLocalData("doneList"),
-        longTodoList: this.getLocalData("longTodoList"),
-        delList: this.getLocalData("delList")
+        todoList: JSON.parse(this.getLocalData("todoList")),
+        doneList: JSON.parse(this.getLocalData("doneList")),
+        longTodoList: JSON.parse(this.getLocalData("longTodoList")),
+        delList: JSON.parse(this.getLocalData("delList"))
       };
-      // console.log("data: ", data);
 
-      if (!data) {
-        alert("没有数据！");
-        return;
-      }
+      // if (!data) {
+      //   alert("没有数据！");
+      //   return;
+      // }
       if (typeof data === "object") {
         data = JSON.stringify(data);
       }

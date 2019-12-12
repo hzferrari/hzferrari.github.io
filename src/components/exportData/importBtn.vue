@@ -23,6 +23,7 @@ export default {
       this.$refs.importInput.click();
     },
     onFileChange(e) {
+      let vm = this;
       let file = e.target.files[0];
       // console.log("file: ", file);
       // console.log(": ", this.$refs.importInput.files);
@@ -30,12 +31,20 @@ export default {
       reader.readAsText(file);
 
       reader.onload = function(evt) {
-        let result = evt.target.result
-        console.log("读取结果：", result);
+        let result = evt.target.result;
 
-        console.log("读取结果转为JSON：");
-        let json = JSON.parse(result);
+        vm.handleLoadRes(result);
       };
+    },
+    /**
+     * 处理本地上传完成的数据
+     */
+    handleLoadRes(data) {
+      data = data.split("hzferrari@qq.com***/")[1];
+      // console.log("handleLoadRes: ", data);
+
+      let dataJson = JSON.parse(data);
+      console.log("读取结果转为JSON：", dataJson);
     }
   }
 };
