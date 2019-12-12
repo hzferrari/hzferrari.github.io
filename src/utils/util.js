@@ -2,7 +2,6 @@
  * 工具类
  */
 
-
 let util = {};
 
 /*
@@ -74,14 +73,11 @@ util.uuid = () => {
   return S4() + S4() + S4() + S4() + S4() + S4() + S4() + S4();
 };
 
-export default util;
-
-
 /**
  * 数组或对象的深拷贝
  * @param {*} data
  */
-export function deepClone(data) {
+util.deepClone = data => {
   // 判断数据类型
   function getType(data) {
     if (Object.prototype.toString.call(data) === "[object Array]") {
@@ -95,7 +91,7 @@ export function deepClone(data) {
 
   var type = getType(data);
   // console.log("type: ", type);
-  
+
   var obj;
   if (type === "array") {
     obj = [];
@@ -107,13 +103,43 @@ export function deepClone(data) {
   }
   if (type === "array") {
     for (var i = 0, len = data.length; i < len; i++) {
-      obj.push(deepClone(data[i]));
+      obj.push(util.deepClone(data[i]));
     }
   } else if (type === "object") {
     for (var key in data) {
-      obj[key] = deepClone(data[key]);
+      obj[key] = util.deepClone(data[key]);
     }
   }
 
   return obj;
-}
+};
+
+/**
+ * 判断是否为手机访问
+ */
+util.isMobile = function() {
+  let userAgentInfo = navigator.userAgent;
+
+  let mobileAgents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
+
+  let mobileFlag = false;
+
+  //根据userAgent判断是否是手机
+  for (let v = 0; v < mobileAgents.length; v++) {
+    if (userAgentInfo.indexOf(mobileAgents[v]) > 0) {
+      mobileFlag = true;
+      break;
+    }
+  }
+  let screenWidth = window.screen.width;
+  let screenHeight = window.screen.height;
+
+  //根据屏幕分辨率判断是否是手机
+  if (screenWidth < 500 && screenHeight < 800) {
+    mobileFlag = true;
+  }
+
+  return mobileFlag;
+};
+
+export default util;
