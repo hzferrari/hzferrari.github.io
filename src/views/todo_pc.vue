@@ -19,7 +19,7 @@
         </span>
         <span class="todo-input-right-space">
           <export-data-btn></export-data-btn>
-          <import-data-btn></import-data-btn>
+          <import-data-btn @import-success="onImportSuccess"></import-data-btn>
         </span>
       </div>
     </div>
@@ -696,6 +696,63 @@ export default {
      */
     calDIffDay(timeStamp) {
       return Math.floor((new Date() - new Date(timeStamp)) / 60 / 60 / 24 / 1000);
+    },
+    /**
+     * 成功导入本地数据
+     */
+    onImportSuccess(data) {
+      let _this = this;
+
+      _insertData(data, "todoList");
+      // _insertData("doneList");
+      _insertData("longTodoList");
+      // _insertData("delList");
+
+      function _insertData(data, listName) {
+        let oldTopList = [];
+        let oldUntopList = [];
+        let importTopList = [];
+        let importUntopList = [];
+
+        let oldListTopCount = 0;
+        let importListTopCount = 0;
+
+        if (!_this[listName]) _this[listName] = [];
+        if (!data[listName]) data[listName] = [];
+
+        for (let i = 0, len = _this[listName].length; i < len; i++) {
+          // 记录原来的列表的置顶项长度
+          if (_this[listName][i].isTop) {
+            oldListTopCount++;
+          }
+          for (let j = 0, len2 = data[listName].length; j < len2; j++) {
+            // 处理重复id
+            if (_this[listName][i].id === data[listName][j].id) {
+              // console.log("data[listName][i].id: ", data[listName][j].id);
+              data[listName][j].id +=
+                "_copy_" + new Date().getTime() + "_" + Math.round(Math.random() * 10000);
+            }
+            // 只在第一次遍历data[listName]时记录置顶项的长度
+            if (i === 0 && data[listName][j].isTop) {
+              importListTopCount++;
+            }
+          }
+        }
+
+        // 截取两个列表的top项
+        oldTopList = _this[listName].slice(0, oldListTopCount);
+        importTopList = data[listName].slice(0, importListTopCount);
+
+        // 截取两个列表的非top项
+        oldUntopList = _this[listName].slice(oldListTopCount);
+        importUntopList = data[listName].slice(importListTopCount);
+
+        // 组合
+        let newTopList = Array.prototype.concat.apply([], [oldTopList, importTopList]);
+        let newUnTopList = Array.prototype.concat.apply([], [oldUntopList, importUntopList]);
+
+        _this[listName] = Array.prototype.concat.apply([], [newTopList, newUnTopList]);
+      }
     }
   }
 };
