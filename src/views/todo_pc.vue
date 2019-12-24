@@ -27,7 +27,7 @@
       <div class="layouts layout-left">
         <div class="long-todo-list-box">
           <div class="title" v-if="longTodoList.length > 0">
-            长期事项
+            <span>长期事项</span>
             <span class="items-sum">{{ longTodoList.length }}</span>
             <span class="collection"
               ><svg-icon
@@ -107,7 +107,7 @@
       <div class="layouts layout-middle">
         <div class="todo-list-box">
           <div class="title">
-            正在进行
+            <span>正在进行</span>
             <span class="items-sum">{{ todoList.length }}</span>
 
             <span class="collection"
@@ -187,7 +187,7 @@
 
         <div class="done-list-box">
           <div class="title">
-            已完成
+            <span>已完成</span>
             <span class="items-sum">{{ doneList.length }}</span>
             <span class="collection">
               <span title="删除所有">
@@ -656,6 +656,9 @@ export default {
     delAllDoneItem() {
       let cf = confirm(`确认要将所有【已完成】项移到【已删除】吗？`);
       if (cf) {
+        this.doneList.forEach(v => {
+          v.delTime = new Date().getTime();
+        });
         this.delList = Array.prototype.concat.apply([], [this.doneList, this.delList]);
         this.doneList = [];
       }
@@ -867,8 +870,10 @@ $textColor2: #555;
       color: $textColor2;
       letter-spacing: 0.7px;
       .items-sum {
+        position: relative;
         display: inline-block;
         padding: 2px;
+        margin-left: 5px;
         // float: right;
         min-width: 16px;
         height: 12px;
