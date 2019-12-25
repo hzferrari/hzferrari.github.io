@@ -5,7 +5,6 @@
       <div class="width-wrapper">
         <span class="title">
           Todo-list
-          <!-- <span class="version">Beta v0.1.1</span> -->
         </span>
         <span class="todo-input">
           <input
@@ -18,8 +17,24 @@
           />
         </span>
         <span class="todo-input-right-space">
-          <export-data-btn></export-data-btn>
-          <import-data-btn @import-success="onImportSuccess"></import-data-btn>
+          <div class="menus" @mouseover="showDropMenu = true" @mouseleave="showDropMenu = false">
+            <svg-icon class="icon" icon-class="menu" />
+          </div>
+          <transition name="menu-anime">
+            <div
+              class="menu-drop-down"
+              v-show="showDropMenu"
+              @mouseover="showDropMenu = true"
+              @mouseleave="showDropMenu = false"
+            >
+              <ul>
+                <li class="items"><export-data-btn></export-data-btn></li>
+                <li class="items">
+                  <import-data-btn @import-success="onImportSuccess"></import-data-btn>
+                </li>
+              </ul>
+            </div>
+          </transition>
         </span>
       </div>
     </div>
@@ -324,7 +339,8 @@ export default {
       doneListVisible: true,
       delListVisible: false,
       delListAutoDelDay: 30, // x天自动删除
-      maxInputLen: 500 // 输入框文本限制长度
+      maxInputLen: 500, // 输入框文本限制长度
+      showDropMenu: false
     };
   },
   watch: {
@@ -698,22 +714,18 @@ export default {
       return Math.floor((new Date() - new Date(timeStamp)) / 60 / 60 / 24 / 1000);
     },
     /**
-     * 成功导入本地数据
+     * 成功导入本地数据后
      */
     onImportSuccess(data) {
       let _this = this;
 
-      _insertData(data, "todoList");
-      // _insertData("doneList");
-      _insertData("longTodoList");
-      // _insertData("delList");
+      _insertDataF1(data, "todoList");
+      _insertDataF2(data, "doneList");
+      _insertDataF1(data, "longTodoList");
+      _insertDataF2(data, "delList");
 
-      function _insertData(data, listName) {
-        let oldTopList = [];
-        let oldUntopList = [];
-        let importTopList = [];
-        let importUntopList = [];
-
+      // 合并有置顶项的列表
+      function _insertDataF1(data, listName) {
         let oldListTopCount = 0;
         let importListTopCount = 0;
 
@@ -728,9 +740,7 @@ export default {
           for (let j = 0, len2 = data[listName].length; j < len2; j++) {
             // 处理重复id
             if (_this[listName][i].id === data[listName][j].id) {
-              // console.log("data[listName][i].id: ", data[listName][j].id);
-              data[listName][j].id +=
-                "_copy_" + new Date().getTime() + "_" + Math.round(Math.random() * 10000);
+              data[listName][j].id += "_copy_" + Math.round(Math.random() * 10000);
             }
             // 只在第一次遍历data[listName]时记录置顶项的长度
             if (i === 0 && data[listName][j].isTop) {
@@ -739,19 +749,34 @@ export default {
           }
         }
 
-        // 截取两个列表的top项
-        oldTopList = _this[listName].slice(0, oldListTopCount);
-        importTopList = data[listName].slice(0, importListTopCount);
-
-        // 截取两个列表的非top项
-        oldUntopList = _this[listName].slice(oldListTopCount);
-        importUntopList = data[listName].slice(importListTopCount);
-
-        // 组合
-        let newTopList = Array.prototype.concat.apply([], [oldTopList, importTopList]);
-        let newUnTopList = Array.prototype.concat.apply([], [oldUntopList, importUntopList]);
+        // 截取两个列表的top项并组合新数组，截取两个列表的非top项并组合新数组
+        // 最后组合成完整列表
+        let newTopList = Array.prototype.concat.apply(
+          [],
+          [_this[listName].slice(0, oldListTopCount), data[listName].slice(0, importListTopCount)]
+        );
+        let newUnTopList = Array.prototype.concat.apply(
+          [],
+          [_this[listName].slice(oldListTopCount), data[listName].slice(importListTopCount)]
+        );
 
         _this[listName] = Array.prototype.concat.apply([], [newTopList, newUnTopList]);
+      }
+      // 合并没有置顶项的列表，导入的项目直接往最后放
+      function _insertDataF2(data, listName) {
+        if (!_this[listName]) _this[listName] = [];
+        if (!data[listName]) data[listName] = [];
+
+        for (let i = 0, len = _this[listName].length; i < len; i++) {
+          for (let j = 0, len2 = data[listName].length; j < len2; j++) {
+            // 处理重复id
+            if (_this[listName][i].id === data[listName][j].id) {
+              data[listName][j].id += "_copy_" + Math.round(Math.random() * 10000);
+            }
+          }
+        }
+
+        _this[listName] = Array.prototype.concat.apply([], [_this[listName], data[listName]]);
       }
     }
   }
@@ -806,6 +831,16 @@ $textColor2: #555;
   transform: scale3d(0);
   opacity: 1;
 }
+//下拉菜单动画
+.menu-anime-enter-active,
+.menu-anime-leave-active {
+  transition: all 0.15s;
+}
+.menu-anime-enter,
+.menu-anime-leave-to {
+  // transform: scaleY(0);
+  opacity: 0;
+}
 
 /**拖动样式 */
 .list-item-sortable-ghost {
@@ -848,9 +883,42 @@ $textColor2: #555;
     .title,
     .todo-input,
     .todo-input-right-space {
+      position: relative;
       display: inline-block;
       margin: 0;
       width: 33%;
+      vertical-align: top;
+    }
+    .todo-input-right-space {
+      .menus {
+        display: inline-block;
+        .icon {
+          height: $header-height;
+          line-height: $header-height;
+          font-size: 30px;
+          color: #fff;
+          cursor: pointer;
+        }
+      }
+      .menu-drop-down {
+        position: absolute;
+        top: $header-height - 10px;
+        left: 0;
+        margin-left: 43%;
+        padding: 0 15px;
+        height: auto;
+        line-height: 30px;
+        background: #fff;
+        box-shadow: $bgColor1 0px 0px 5px 1px;
+        border-radius: $borderRadius;
+        .items {
+          padding: 8px 5px;
+          border-bottom: 1px solid #ccc;
+          &:last-child {
+            border-bottom: none;
+          }
+        }
+      }
     }
     .title {
       position: relative;
@@ -858,22 +926,6 @@ $textColor2: #555;
       font-weight: 700;
       color: #507f96;
       text-shadow: 1px 2px 0px #efefef;
-
-      // .version {
-      //   position: absolute;
-      //   top: 0;
-      //   right: 0;
-      //   display: inline-block;
-      //   height: 20px;
-      //   line-height: 15px;
-      //   width: 20px;
-      //   background: #f9ffbd;
-      //   border-radius: $borderRadius;
-      //   color: #555;
-      //   font-size: 8px;
-      //   font-weight: 300;
-      //   text-shadow: none;
-      // }
     }
     .todo-input {
       margin: 0 auto;

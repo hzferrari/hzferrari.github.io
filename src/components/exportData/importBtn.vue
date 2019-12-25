@@ -45,7 +45,7 @@ export default {
 
       let dataJson = JSON.parse(data);
       console.log("读取结果转为JSON：", dataJson);
-      this.$emit('import-success', dataJson)
+      this.$emit("import-success", dataJson);
     }
   }
 };
@@ -56,6 +56,9 @@ export default {
   display: inline-block;
   .btn {
     cursor: pointer;
+    &:hover {
+      color: #abc;
+    }
   }
 }
 </style>

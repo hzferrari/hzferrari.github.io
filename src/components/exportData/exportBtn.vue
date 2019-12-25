@@ -62,6 +62,9 @@ export default {
   display: inline-block;
   .btn {
     cursor: pointer;
+    &:hover{
+      color: #abc;
+    }
   }
 }
 </style>
