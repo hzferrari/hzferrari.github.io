@@ -4,7 +4,7 @@
     <div class="header">
       <div class="width-wrapper">
         <span class="title">
-          Todo-list
+          待办事项
         </span>
         <span class="todo-input">
           <input
@@ -890,8 +890,10 @@ $textColor2: #555;
       vertical-align: top;
     }
     .todo-input-right-space {
+      text-align: left;
       .menus {
         display: inline-block;
+        margin-left: 50%;
         .icon {
           height: $header-height;
           line-height: $header-height;
@@ -902,15 +904,27 @@ $textColor2: #555;
       }
       .menu-drop-down {
         position: absolute;
-        top: $header-height - 10px;
+        top: $header-height - 3px;
         left: 0;
-        margin-left: 43%;
+        margin-left: 45%;
         padding: 0 15px;
         height: auto;
         line-height: 30px;
         background: #fff;
         box-shadow: $bgColor1 0px 0px 5px 1px;
         border-radius: $borderRadius;
+        &::before {
+          content: "";
+          position: absolute;
+          top: -16px;
+          left: 34px;
+          width: 0;
+          height: 0;
+          border-width: 8px;
+          border-style: solid;
+          border-color: transparent #fff transparent transparent;
+          transform: rotate(90deg);
+        }
         .items {
           padding: 8px 5px;
           border-bottom: 1px solid #ccc;
@@ -924,8 +938,10 @@ $textColor2: #555;
       position: relative;
       font-size: 30px;
       font-weight: 700;
-      color: #507f96;
-      text-shadow: 1px 2px 0px #efefef;
+      // color: #507f96;
+      color: #fff;
+      letter-spacing: 2px;
+      text-shadow: 1px 2px 0px #8e8e8e;
     }
     .todo-input {
       margin: 0 auto;
