@@ -20,16 +20,12 @@ export default {
   methods: {
     saveDataAsJson() {
       let data = {
-        todoList: JSON.parse(this.getLocalData("todoList")),
-        doneList: JSON.parse(this.getLocalData("doneList")),
-        longTodoList: JSON.parse(this.getLocalData("longTodoList")),
-        delList: JSON.parse(this.getLocalData("delList"))
+        todoList: this.getLocalData("todoList"),
+        doneList: this.getLocalData("doneList"),
+        longTodoList: this.getLocalData("longTodoList"),
+        delList: this.getLocalData("delList")
       };
 
-      // if (!data) {
-      //   alert("没有数据！");
-      //   return;
-      // }
       if (typeof data === "object") {
         data = JSON.stringify(data);
       }
@@ -40,18 +36,28 @@ export default {
       let blob = new Blob([data], { type: "text/json" });
       let a = document.createElement("a");
 
-      a.download = "cs_todolist_savedata_" + util.formatDate(new Date(), "yyyyMMddhhmm") + ".json"; // 设置文件名
+      if (window.navigator.msSaveOrOpenBlob) {
+        // 兼容IE下载
+        navigator.msSaveBlob(
+          blob,
+          "cs_todolist_savedata_" + util.formatDate(new Date(), "yyyyMMddhhmm") + ".json"
+        );
+      } else {
+        // 设置文件名
+        a.download =
+          "cs_todolist_savedata_" + util.formatDate(new Date(), "yyyyMMddhhmm") + ".json";
 
-      a.href = window.URL.createObjectURL(blob);
-      a.dataset.downloadurl = ["text/json", a.download, a.href].join(":");
-      // console.log('a: ', a);
-      a.click();
+        a.href = window.URL.createObjectURL(blob);
+        a.dataset.downloadurl = ["text/json", a.download, a.href].join(":");
+        // console.log("a: ", a);
+        a.click();
+      }
     },
     /**
      * 从本地恢复数据
      */
     getLocalData(listName) {
-      return localStorage.getItem(listName);
+      return JSON.parse(localStorage.getItem(listName));
     }
   }
 };
@@ -62,7 +68,7 @@ export default {
   display: inline-block;
   .btn {
     cursor: pointer;
-    &:hover{
+    &:hover {
       color: #abc;
     }
   }
