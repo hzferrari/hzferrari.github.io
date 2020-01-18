@@ -17,7 +17,7 @@
           />
         </span>
         <span class="todo-input-right-space">
-          <div class="menus" @mouseover="showDropMenu = true" @mouseleave="showDropMenu = false">
+          <div class="menus" @click="showDropMenu = true" @mouseleave="showDropMenu = false">
             <svg-icon class="icon" icon-class="menu" />
           </div>
           <transition name="menu-anime">
