@@ -3,9 +3,7 @@
     <div id="scroll-anchor"></div>
     <div class="header">
       <div class="width-wrapper">
-        <span class="title">
-          待办事项
-        </span>
+        <span class="title">待办事项</span>
         <span class="todo-input">
           <input
             v-model="todoInputingValue"
@@ -17,24 +15,7 @@
           />
         </span>
         <span class="todo-input-right-space">
-          <div class="menus" @click="showDropMenu = true" @mouseleave="showDropMenu = false">
-            <svg-icon class="icon" icon-class="menu" />
-          </div>
-          <transition name="menu-anime">
-            <div
-              class="menu-drop-down"
-              v-show="showDropMenu"
-              @mouseover="showDropMenu = true"
-              @mouseleave="showDropMenu = false"
-            >
-              <ul>
-                <li class="items"><export-data-btn></export-data-btn></li>
-                <li class="items">
-                  <import-data-btn @import-success="onImportSuccess"></import-data-btn>
-                </li>
-              </ul>
-            </div>
-          </transition>
+          <setting-menus @import-success="onImportSuccess"></setting-menus>
         </span>
       </div>
     </div>
@@ -44,13 +25,14 @@
           <div class="title" v-if="longTodoList.length > 0">
             <span>长期事项</span>
             <span class="items-sum">{{ longTodoList.length }}</span>
-            <span class="collection"
-              ><svg-icon
+            <span class="collection">
+              <svg-icon
                 class="icons"
                 :class="{ rotate: !longTodoListVisible }"
                 icon-class="down"
                 @click="foldList('longTodoList')"
-            /></span>
+              />
+            </span>
           </div>
           <transition name="list-anime3">
             <transition-group
@@ -84,34 +66,40 @@
                 ></cs-edit-input>
 
                 <div class="collection">
-                  <span class="time" title="创建日期">{{
+                  <span class="time" title="创建日期">
+                    {{
                     formatDate(new Date(item.createTime), "yyyy-MM-dd hh:mm")
-                  }}</span>
+                    }}
+                  </span>
                   <span class="operations">
-                    <span title="置顶" v-show="!item.isTop"
-                      ><svg-icon
+                    <span title="置顶" v-show="!item.isTop">
+                      <svg-icon
                         class="icons"
                         icon-class="pin"
                         @click="toTop(item, index, 'longTodoList')"
-                    /></span>
-                    <span title="取消置顶" v-show="item.isTop"
-                      ><svg-icon
+                      />
+                    </span>
+                    <span title="取消置顶" v-show="item.isTop">
+                      <svg-icon
                         class="icons is-top"
                         icon-class="pin"
                         @click="cancelTop(item, index, 'longTodoList')"
-                    /></span>
-                    <span title="移至普通事项"
-                      ><svg-icon
+                      />
+                    </span>
+                    <span title="移至普通事项">
+                      <svg-icon
                         class="icons long-time"
                         icon-class="wave"
                         @click="moveItem(item, index, 'longTodoList', 'todoList')"
-                    /></span>
-                    <span title="删除"
-                      ><svg-icon
+                      />
+                    </span>
+                    <span title="删除">
+                      <svg-icon
                         class="icons"
                         icon-class="cross"
                         @click="delItem(item, index, 'longTodoList', false)"
-                    /></span>
+                      />
+                    </span>
                   </span>
                 </div>
               </li>
@@ -125,13 +113,14 @@
             <span>正在进行</span>
             <span class="items-sum">{{ todoList.length }}</span>
 
-            <span class="collection"
-              ><svg-icon
+            <span class="collection">
+              <svg-icon
                 class="icons"
                 :class="{ rotate: !todoListVisible }"
                 icon-class="down"
                 @click="foldList('todoList')"
-            /></span>
+              />
+            </span>
           </div>
           <transition name="list-anime3">
             <transition-group
@@ -165,34 +154,40 @@
                 ></cs-edit-input>
 
                 <div class="collection">
-                  <span class="time" title="创建日期">{{
+                  <span class="time" title="创建日期">
+                    {{
                     formatDate(new Date(item.createTime), "yyyy-MM-dd hh:mm")
-                  }}</span>
+                    }}
+                  </span>
                   <span class="operations">
-                    <span title="置顶" v-show="!item.isTop"
-                      ><svg-icon
+                    <span title="置顶" v-show="!item.isTop">
+                      <svg-icon
                         class="icons"
                         icon-class="pin"
                         @click="toTop(item, index, 'todoList')"
-                    /></span>
-                    <span title="取消置顶" v-show="item.isTop"
-                      ><svg-icon
+                      />
+                    </span>
+                    <span title="取消置顶" v-show="item.isTop">
+                      <svg-icon
                         class="icons is-top"
                         icon-class="pin"
                         @click="cancelTop(item, index, 'todoList')"
-                    /></span>
-                    <span title="长期事项"
-                      ><svg-icon
+                      />
+                    </span>
+                    <span title="长期事项">
+                      <svg-icon
                         class="icons"
                         icon-class="wave"
                         @click="moveItem(item, index, 'todoList', 'longTodoList')"
-                    /></span>
-                    <span title="删除"
-                      ><svg-icon
+                      />
+                    </span>
+                    <span title="删除">
+                      <svg-icon
                         class="icons"
                         icon-class="cross"
                         @click="delItem(item, index, 'todoList', false)"
-                    /></span>
+                      />
+                    </span>
                   </span>
                 </div>
               </li>
@@ -206,14 +201,15 @@
             <span class="items-sum">{{ doneList.length }}</span>
             <span class="collection">
               <span title="删除所有">
-                <svg-icon class="icons" icon-class="delete" @click="delAllDoneItem()"
-              /></span>
+                <svg-icon class="icons" icon-class="delete" @click="delAllDoneItem()" />
+              </span>
               <svg-icon
                 class="icons"
                 :class="{ rotate: !doneListVisible }"
                 icon-class="down"
                 @click="foldList('doneList')"
-            /></span>
+              />
+            </span>
           </div>
           <transition name="list-anime3">
             <transition-group
@@ -235,16 +231,19 @@
                   <span>{{ item.content }}</span>
                 </div>
                 <div class="collection">
-                  <span class="time" title="完成日期">{{
+                  <span class="time" title="完成日期">
+                    {{
                     formatDate(new Date(item.doneTime), "yyyy-MM-dd hh:mm")
-                  }}</span>
+                    }}
+                  </span>
                   <span class="operations">
-                    <span title="删除"
-                      ><svg-icon
+                    <span title="删除">
+                      <svg-icon
                         class="icons"
                         icon-class="cross"
                         @click="delItem(item, index, 'doneList', false)"
-                    /></span>
+                      />
+                    </span>
                   </span>
                 </div>
               </li>
@@ -257,15 +256,16 @@
             <span title="事项删除30天后将被自动移除">已删除</span>
             <span class="items-sum">{{ delList.length }}</span>
             <span class="collection">
-              <span title="彻底删除所有"
-                ><svg-icon class="icons" icon-class="delete" @click="delAllDelItem()"
-              /></span>
+              <span title="彻底删除所有">
+                <svg-icon class="icons" icon-class="delete" @click="delAllDelItem()" />
+              </span>
               <svg-icon
                 class="icons"
                 :class="{ rotate: !delListVisible }"
                 icon-class="down"
                 @click="foldList('delList')"
-            /></span>
+              />
+            </span>
           </div>
           <transition name="list-anime3">
             <transition-group
@@ -283,22 +283,26 @@
                   <del>{{ item.content }}</del>
                 </div>
                 <div class="collection">
-                  <span class="time" title="删除日期">{{
+                  <span class="time" title="删除日期">
+                    {{
                     formatDate(new Date(item.delTime), "yyyy-MM-dd hh:mm")
-                  }}</span>
-                  <span class="auto-del-hints" v-if="item.autoDelDay && item.autoDelDay <= 10">
-                    此条项目将在{{ item.autoDelDay }}天后自动删除
+                    }}
                   </span>
+                  <span
+                    class="auto-del-hints"
+                    v-if="item.autoDelDay && item.autoDelDay <= 10"
+                  >此条项目将在{{ item.autoDelDay }}天后自动删除</span>
                   <span class="operations">
-                    <span title="恢复项目"
-                      ><svg-icon class="icons" icon-class="return" @click="returnItem(item, index)"
-                    /></span>
-                    <span title="彻底删除"
-                      ><svg-icon
+                    <span title="恢复项目">
+                      <svg-icon class="icons" icon-class="return" @click="returnItem(item, index)" />
+                    </span>
+                    <span title="彻底删除">
+                      <svg-icon
                         class="icons"
                         icon-class="cross"
                         @click="delItem(item, index, 'delList', false)"
-                    /></span>
+                      />
+                    </span>
                   </span>
                 </div>
               </li>
@@ -316,16 +320,14 @@ import Sortable from "sortablejs";
 import util from "@/utils/util";
 import CsCheckbox from "@/components/CheckBox";
 import CsEditInput from "@/components/CsEditInput";
-import exportDataBtn from "@/components/exportData/exportBtn";
-import importDataBtn from "@/components/exportData/importBtn";
+import SettingMenus from "@/components/SettingMenus";
 
 export default {
   name: "CS-Todo",
   components: {
     CsCheckbox,
     CsEditInput,
-    exportDataBtn,
-    importDataBtn
+    SettingMenus
   },
   data() {
     return {
@@ -554,7 +556,11 @@ export default {
       if (evt.target.value && evt.target.value.trim() != "") {
         let o = {
           content: evt.target.value.trim(),
-          id: "_000_" + new Date().getTime() + "_" + Math.round(Math.random() * 10000),
+          id:
+            "_000_" +
+            new Date().getTime() +
+            "_" +
+            Math.round(Math.random() * 10000),
           hasDone: false, // 是否完成
           hasDel: false, // 是否删除
           isEdit: false, // 是否编辑状态
@@ -564,7 +570,9 @@ export default {
           delTime: -1
         };
 
-        document.querySelector("#scroll-anchor").scrollIntoView({ behavior: "instant" });
+        document
+          .querySelector("#scroll-anchor")
+          .scrollIntoView({ behavior: "instant" });
 
         // 插入在非置顶项的第一个
         this.insertItemUnderTop(o, "todoList");
@@ -675,7 +683,10 @@ export default {
         this.doneList.forEach(v => {
           v.delTime = new Date().getTime();
         });
-        this.delList = Array.prototype.concat.apply([], [this.doneList, this.delList]);
+        this.delList = Array.prototype.concat.apply(
+          [],
+          [this.doneList, this.delList]
+        );
         this.doneList = [];
       }
     },
@@ -711,7 +722,9 @@ export default {
      * // 计算日期到今天的相差天数，向下取整
      */
     calDIffDay(timeStamp) {
-      return Math.floor((new Date() - new Date(timeStamp)) / 60 / 60 / 24 / 1000);
+      return Math.floor(
+        (new Date() - new Date(timeStamp)) / 60 / 60 / 24 / 1000
+      );
     },
     /**
      * 成功导入本地数据后
@@ -740,7 +753,8 @@ export default {
           for (let j = 0, len2 = data[listName].length; j < len2; j++) {
             // 处理重复id
             if (_this[listName][i].id === data[listName][j].id) {
-              data[listName][j].id += "_copy_" + Math.round(Math.random() * 10000);
+              data[listName][j].id +=
+                "_copy_" + Math.round(Math.random() * 10000);
             }
             // 只在第一次遍历data[listName]时记录置顶项的长度
             if (i === 0 && data[listName][j].isTop) {
@@ -753,14 +767,23 @@ export default {
         // 最后组合成完整列表
         let newTopList = Array.prototype.concat.apply(
           [],
-          [_this[listName].slice(0, oldListTopCount), data[listName].slice(0, importListTopCount)]
+          [
+            _this[listName].slice(0, oldListTopCount),
+            data[listName].slice(0, importListTopCount)
+          ]
         );
         let newUnTopList = Array.prototype.concat.apply(
           [],
-          [_this[listName].slice(oldListTopCount), data[listName].slice(importListTopCount)]
+          [
+            _this[listName].slice(oldListTopCount),
+            data[listName].slice(importListTopCount)
+          ]
         );
 
-        _this[listName] = Array.prototype.concat.apply([], [newTopList, newUnTopList]);
+        _this[listName] = Array.prototype.concat.apply(
+          [],
+          [newTopList, newUnTopList]
+        );
       }
       // 合并没有置顶项的列表，导入的项目直接往最后放
       function _insertDataF2(data, listName) {
@@ -771,12 +794,16 @@ export default {
           for (let j = 0, len2 = data[listName].length; j < len2; j++) {
             // 处理重复id
             if (_this[listName][i].id === data[listName][j].id) {
-              data[listName][j].id += "_copy_" + Math.round(Math.random() * 10000);
+              data[listName][j].id +=
+                "_copy_" + Math.round(Math.random() * 10000);
             }
           }
         }
 
-        _this[listName] = Array.prototype.concat.apply([], [_this[listName], data[listName]]);
+        _this[listName] = Array.prototype.concat.apply(
+          [],
+          [_this[listName], data[listName]]
+        );
       }
     }
   }
@@ -831,16 +858,6 @@ $textColor2: #555;
   transform: scale3d(0);
   opacity: 1;
 }
-//下拉菜单动画
-.menu-anime-enter-active,
-.menu-anime-leave-active {
-  transition: all 0.15s;
-}
-.menu-anime-enter,
-.menu-anime-leave-to {
-  // transform: scaleY(0);
-  opacity: 0;
-}
 
 /**拖动样式 */
 .list-item-sortable-ghost {
@@ -891,48 +908,6 @@ $textColor2: #555;
     }
     .todo-input-right-space {
       text-align: left;
-      .menus {
-        display: inline-block;
-        margin-left: 50%;
-        .icon {
-          height: $header-height;
-          line-height: $header-height;
-          font-size: 30px;
-          color: #fff;
-          cursor: pointer;
-        }
-      }
-      .menu-drop-down {
-        position: absolute;
-        top: $header-height - 3px;
-        left: 0;
-        margin-left: 45%;
-        padding: 0 15px;
-        height: auto;
-        line-height: 30px;
-        background: #fff;
-        box-shadow: $bgColor1 0px 0px 5px 1px;
-        border-radius: $borderRadius;
-        &::before {
-          content: "";
-          position: absolute;
-          top: -16px;
-          left: 34px;
-          width: 0;
-          height: 0;
-          border-width: 8px;
-          border-style: solid;
-          border-color: transparent #fff transparent transparent;
-          transform: rotate(90deg);
-        }
-        .items {
-          padding: 8px 5px;
-          border-bottom: 1px solid #ccc;
-          &:last-child {
-            border-bottom: none;
-          }
-        }
-      }
     }
     .title {
       position: relative;
