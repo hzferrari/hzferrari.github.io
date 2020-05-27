@@ -12,7 +12,7 @@
             icon-class="github"
             @click="gotoGithub"
           />
-          beta 0.3.1
+          beta 0.4.0
         </span>
       </p>
       <p>Copyright © 2019 <span style="font-style:italic">hzferrari@qq.com </span></p>

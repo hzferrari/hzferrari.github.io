@@ -1,6 +1,6 @@
 <template>
   <div class="cs-edit-input">
-    <div
+    <!-- <div
       :contenteditable="isEdit"
       :ref="'input' + id"
       class="edit-content"
@@ -8,18 +8,30 @@
       type="text"
       @input="onInputing"
       @paste="onPaste"
-      @keydown="onKeydown"
+      @keydown="enterPressBlur"
       @click="onClick"
       @blur="onBlur"
     >
       {{ content }}
-    </div>
+    </div>-->
+
+    <!-- 可换行 -->
+    <div
+      v-html="content"
+      :contenteditable="isEdit"
+      :ref="'input' + id"
+      class="edit-content"
+      :class="{ editing: isEdit, del: del }"
+      type="text"
+      @input="onInputing"
+      @paste="onPaste"
+      @click="onClick"
+      @blur="onBlur"
+    ></div>
   </div>
 </template>
 
 <script>
-import util from "@/utils/util";
-
 export default {
   name: "CS-Edit-Input",
   components: {},
@@ -41,6 +53,10 @@ export default {
       type: Boolean,
       required: true,
       default: false
+    },
+    del: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -61,7 +77,7 @@ export default {
      * @event
      * 输入框按回车时，自动blur
      */
-    onKeydown(e) {
+    enterPressBlur(e) {
       if (e.keyCode === 13) {
         // 按下回车键
         e.target.blur();
@@ -97,7 +113,7 @@ export default {
       } else if (window.clipboardData && window.clipboardData.getData) {
         text = window.clipboardData.getData("Text");
       }
-      
+
       // 将换行符替换为空格，否则有bug
       text = text.replace(/\r\n/g, " ");
 
@@ -122,7 +138,8 @@ export default {
      * blur时
      */
     onBlur(item) {
-      this.content = this.$refs["input" + this.id].innerText;
+      // this.content = this.$refs["input" + this.id].innerText;
+      this.content = this.$refs["input" + this.id].innerHTML;
 
       this.$emit("blur");
     },
@@ -160,6 +177,9 @@ export default {
     &.editing {
       box-shadow: inset 0px -0.5px 0px #ddd; // 用box-shadow，高度变化时文字不会产生移动
       cursor: auto;
+    }
+    &.del {
+      text-decoration: line-through;
     }
   }
 }

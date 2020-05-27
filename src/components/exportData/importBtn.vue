@@ -44,7 +44,7 @@ export default {
       // console.log("handleLoadRes: ", data);
 
       let dataJson = JSON.parse(data);
-      console.log("读取结果转为JSON：", dataJson);
+      // console.log("读取结果转为JSON：", dataJson);
       this.$emit("import-success", dataJson);
     }
   }

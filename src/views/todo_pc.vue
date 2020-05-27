@@ -228,7 +228,13 @@
                   ></cs-checkbox>
                 </span>
                 <div class="content">
-                  <span>{{ item.content }}</span>
+                  <!-- <span>{{ item.content }}</span> -->
+                  <cs-edit-input
+                    class="editor"
+                    v-model="item.content"
+                    :id="item.id"
+                    :isEdit="false"
+                  ></cs-edit-input>
                 </div>
                 <div class="collection">
                   <span class="time" title="完成日期">
@@ -280,7 +286,14 @@
                   <cs-checkbox class="inner" v-model="item.hasDone"></cs-checkbox>
                 </span>
                 <div class="content">
-                  <del>{{ item.content }}</del>
+                  <!-- <del>{{ item.content }}</del> -->
+                  <cs-edit-input
+                    class="editor"
+                    v-model="item.content"
+                    :id="item.id"
+                    :isEdit="false"
+                    del
+                  ></cs-edit-input>
                 </div>
                 <div class="collection">
                   <span class="time" title="删除日期">
