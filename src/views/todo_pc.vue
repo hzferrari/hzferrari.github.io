@@ -44,31 +44,60 @@
             >
               <li
                 class="items todo-list-item"
-                :class="{ 'is-top-item': item.isTop, 'un-top-item': !item.isTop }"
+                :class="{
+                  'is-top-item': item.isTop,
+                  'un-top-item': !item.isTop,
+                  'is-fold': item.isFold,
+                }"
                 v-for="(item, index) in longTodoList"
                 :key="item.id"
               >
-                <span class="check">
-                  <cs-checkbox
-                    class="inner"
-                    v-model="item.hasDone"
-                    @change="onTodoListItemCheckChange(item, index, 'longTodoList')"
-                  ></cs-checkbox>
-                </span>
+                <div class="line-1">
+                  <!-- check按钮 -->
+                  <span class="check">
+                    <cs-checkbox
+                      class="inner"
+                      v-model="item.hasDone"
+                      @change="
+                        onTodoListItemCheckChange(item, index, 'longTodoList')
+                      "
+                    ></cs-checkbox>
+                  </span>
 
-                <cs-edit-input
-                  class="editor"
-                  v-model="item.content"
-                  :id="item.id"
-                  :isEdit="item.isEdit"
-                  @click="onItemClick(item)"
-                  @blur="onItemInputBlur(item)"
-                ></cs-edit-input>
+                  <!-- 编辑输入框 -->
+                  <div class="content">
+                    <cs-edit-input
+                      class="editor"
+                      v-model="item.content"
+                      :id="item.id"
+                      :isEdit="item.isEdit && !item.isFold"
+                      @click="onItemClick(item)"
+                      @blur="onItemInputBlur(item)"
+                    ></cs-edit-input>
+                  </div>
 
+                  <!-- 右上角图标 -->
+                  <span class="right-top-btn">
+                    <svg-icon
+                      v-show="!item.isFold"
+                      class="icons"
+                      icon-class="minus"
+                      @click="foldItem(item)"
+                    />
+                    <svg-icon
+                      v-show="item.isFold"
+                      class="icons"
+                      icon-class="plus"
+                      @click="foldItem(item)"
+                    />
+                  </span>
+                </div>
+
+                <!-- 底部日期和按钮 -->
                 <div class="collection">
                   <span class="time" title="创建日期">
                     {{
-                    formatDate(new Date(item.createTime), "yyyy-MM-dd hh:mm")
+                      formatDate(new Date(item.createTime), "yyyy-MM-dd hh:mm")
                     }}
                   </span>
                   <span class="operations">
@@ -90,7 +119,9 @@
                       <svg-icon
                         class="icons long-time"
                         icon-class="wave"
-                        @click="moveItem(item, index, 'longTodoList', 'todoList')"
+                        @click="
+                          moveItem(item, index, 'longTodoList', 'todoList')
+                        "
                       />
                     </span>
                     <span title="删除">
@@ -132,31 +163,60 @@
             >
               <li
                 class="items todo-list-item"
-                :class="{ 'is-top-item': item.isTop, 'un-top-item': !item.isTop }"
+                :class="{
+                  'is-top-item': item.isTop,
+                  'un-top-item': !item.isTop,
+                  'is-fold': item.isFold,
+                }"
                 v-for="(item, index) in todoList"
                 :key="item.id"
               >
-                <span class="check">
-                  <cs-checkbox
-                    class="inner"
-                    v-model="item.hasDone"
-                    @change="onTodoListItemCheckChange(item, index, 'todoList')"
-                  ></cs-checkbox>
-                </span>
+                <div class="line-1">
+                  <!-- check按钮 -->
+                  <span class="check">
+                    <cs-checkbox
+                      class="inner"
+                      v-model="item.hasDone"
+                      @change="
+                        onTodoListItemCheckChange(item, index, 'todoList')
+                      "
+                    ></cs-checkbox>
+                  </span>
 
-                <cs-edit-input
-                  class="editor"
-                  v-model="item.content"
-                  :id="item.id"
-                  :isEdit="item.isEdit"
-                  @click="onItemClick(item)"
-                  @blur="onItemInputBlur(item)"
-                ></cs-edit-input>
+                  <!-- 编辑输入框 -->
+                  <div class="content">
+                    <cs-edit-input
+                      class="editor"
+                      v-model="item.content"
+                      :id="item.id"
+                      :isEdit="item.isEdit && !item.isFold"
+                      @click="onItemClick(item)"
+                      @blur="onItemInputBlur(item)"
+                    ></cs-edit-input>
+                  </div>
 
+                  <!-- 右上角图标 -->
+                  <span class="right-top-btn">
+                    <svg-icon
+                      v-show="!item.isFold"
+                      class="icons"
+                      icon-class="minus"
+                      @click="foldItem(item)"
+                    />
+                    <svg-icon
+                      v-show="item.isFold"
+                      class="icons"
+                      icon-class="plus"
+                      @click="foldItem(item)"
+                    />
+                  </span>
+                </div>
+
+                <!-- 底部日期和按钮 -->
                 <div class="collection">
                   <span class="time" title="创建日期">
                     {{
-                    formatDate(new Date(item.createTime), "yyyy-MM-dd hh:mm")
+                      formatDate(new Date(item.createTime), "yyyy-MM-dd hh:mm")
                     }}
                   </span>
                   <span class="operations">
@@ -178,7 +238,9 @@
                       <svg-icon
                         class="icons"
                         icon-class="wave"
-                        @click="moveItem(item, index, 'todoList', 'longTodoList')"
+                        @click="
+                          moveItem(item, index, 'todoList', 'longTodoList')
+                        "
                       />
                     </span>
                     <span title="删除">
@@ -201,7 +263,11 @@
             <span class="items-sum">{{ doneList.length }}</span>
             <span class="collection">
               <span title="删除所有">
-                <svg-icon class="icons" icon-class="delete" @click="delAllDoneItem()" />
+                <svg-icon
+                  class="icons"
+                  icon-class="delete"
+                  @click="delAllDoneItem()"
+                />
               </span>
               <svg-icon
                 class="icons"
@@ -219,27 +285,33 @@
               name="list-anime2"
               tag="ul"
             >
-              <li class="items done-list-item" v-for="(item, index) in doneList" :key="item.id">
-                <span class="check">
-                  <cs-checkbox
-                    class="inner"
-                    v-model="item.hasDone"
-                    @change="onDoneListItemCheckChange(item, index)"
-                  ></cs-checkbox>
-                </span>
-                <div class="content">
-                  <!-- <span>{{ item.content }}</span> -->
-                  <cs-edit-input
-                    class="editor"
-                    v-model="item.content"
-                    :id="item.id"
-                    :isEdit="false"
-                  ></cs-edit-input>
+              <li
+                class="items done-list-item"
+                v-for="(item, index) in doneList"
+                :key="item.id"
+              >
+                <div class="line-1">
+                  <span class="check">
+                    <cs-checkbox
+                      class="inner"
+                      v-model="item.hasDone"
+                      @change="onDoneListItemCheckChange(item, index)"
+                    ></cs-checkbox>
+                  </span>
+                  <div class="content">
+                    <cs-edit-input
+                      class="editor"
+                      v-model="item.content"
+                      :id="item.id"
+                      :isEdit="false"
+                    ></cs-edit-input>
+                  </div>
                 </div>
+
                 <div class="collection">
                   <span class="time" title="完成日期">
                     {{
-                    formatDate(new Date(item.doneTime), "yyyy-MM-dd hh:mm")
+                      formatDate(new Date(item.doneTime), "yyyy-MM-dd hh:mm")
                     }}
                   </span>
                   <span class="operations">
@@ -263,7 +335,11 @@
             <span class="items-sum">{{ delList.length }}</span>
             <span class="collection">
               <span title="彻底删除所有">
-                <svg-icon class="icons" icon-class="delete" @click="delAllDelItem()" />
+                <svg-icon
+                  class="icons"
+                  icon-class="delete"
+                  @click="delAllDelItem()"
+                />
               </span>
               <svg-icon
                 class="icons"
@@ -281,33 +357,45 @@
               name="list-anime2"
               tag="ul"
             >
-              <li class="items del-list-item" v-for="(item, index) in delList" :key="item.id">
-                <span class="check">
-                  <cs-checkbox class="inner" v-model="item.hasDone"></cs-checkbox>
-                </span>
-                <div class="content">
-                  <!-- <del>{{ item.content }}</del> -->
-                  <cs-edit-input
-                    class="editor"
-                    v-model="item.content"
-                    :id="item.id"
-                    :isEdit="false"
-                    del
-                  ></cs-edit-input>
+              <li
+                class="items del-list-item"
+                v-for="(item, index) in delList"
+                :key="item.id"
+              >
+                <div class="line-1">
+                  <span class="check">
+                    <cs-checkbox
+                      class="inner"
+                      v-model="item.hasDone"
+                    ></cs-checkbox>
+                  </span>
+                  <div class="content">
+                    <cs-edit-input
+                      class="editor"
+                      v-model="item.content"
+                      :id="item.id"
+                      :isEdit="false"
+                      del
+                    ></cs-edit-input>
+                  </div>
                 </div>
+
                 <div class="collection">
                   <span class="time" title="删除日期">
-                    {{
-                    formatDate(new Date(item.delTime), "yyyy-MM-dd hh:mm")
-                    }}
+                    {{ formatDate(new Date(item.delTime), "yyyy-MM-dd hh:mm") }}
                   </span>
                   <span
                     class="auto-del-hints"
                     v-if="item.autoDelDay && item.autoDelDay <= 10"
-                  >此条项目将在{{ item.autoDelDay }}天后自动删除</span>
+                    >此条项目将在{{ item.autoDelDay }}天后自动删除</span
+                  >
                   <span class="operations">
                     <span title="恢复项目">
-                      <svg-icon class="icons" icon-class="return" @click="returnItem(item, index)" />
+                      <svg-icon
+                        class="icons"
+                        icon-class="return"
+                        @click="returnItem(item, index)"
+                      />
                     </span>
                     <span title="彻底删除">
                       <svg-icon
@@ -340,7 +428,7 @@ export default {
   components: {
     CsCheckbox,
     CsEditInput,
-    SettingMenus
+    SettingMenus,
   },
   data() {
     return {
@@ -355,7 +443,7 @@ export default {
       delListVisible: false,
       delListAutoDelDay: 30, // x天自动删除
       maxInputLen: 500, // 输入框文本限制长度
-      showDropMenu: false
+      showDropMenu: false,
     };
   },
   watch: {
@@ -363,31 +451,31 @@ export default {
      * list发生变化时也记录在本地(需要deep监听)
      */
     todoList: {
-      handler: function(val, oldVal) {
+      handler: function (val, oldVal) {
         localStorage.setItem("todoList", JSON.stringify(val));
         this.initSortable();
       },
-      deep: true
+      deep: true,
     },
     doneList: {
-      handler: function(val, oldVal) {
+      handler: function (val, oldVal) {
         localStorage.setItem("doneList", JSON.stringify(val));
       },
-      deep: true
+      deep: true,
     },
     longTodoList: {
-      handler: function(val, oldVal) {
+      handler: function (val, oldVal) {
         localStorage.setItem("longTodoList", JSON.stringify(val));
         this.initSortable();
       },
-      deep: true
+      deep: true,
     },
     delList: {
-      handler: function(val, oldVal) {
+      handler: function (val, oldVal) {
         localStorage.setItem("delList", JSON.stringify(val));
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
   created() {
     this.recoverData("todoList");
@@ -420,7 +508,7 @@ export default {
         this[listName] = [];
       }
       // 编辑状态全部置为false
-      this[listName].forEach(v => {
+      this[listName].forEach((v) => {
         v.isEdit = false;
       });
     },
@@ -464,7 +552,7 @@ export default {
           scrollSpeed: 5, // px
           animation: 150,
           scrollSensitivity: 30,
-          onUpdate: evt => {
+          onUpdate: (evt) => {
             // sortable改变了真实DOM的排序后,在回调函数里还原移动过的DOM（避免和Vue自带的DOM操作冲突）
             let newIndex = evt.newIndex;
             let oldIndex = evt.oldIndex;
@@ -498,7 +586,7 @@ export default {
             // } else {
             //   el.insertBefore(newChild, oldChild.nextSibling);
             // }
-          }
+          },
         });
       }
 
@@ -511,14 +599,14 @@ export default {
           scrollSpeed: 5, // px
           animation: 150,
           scrollSensitivity: 30,
-          onUpdate: evt => {
+          onUpdate: (evt) => {
             // sortable改变了真实DOM的排序后,在回调函数里还原移动过的DOM（避免和Vue自带的DOM操作冲突）
             let newIndex = evt.newIndex;
             let oldIndex = evt.oldIndex;
 
             let tpm = _this[listName].splice(oldIndex, 1);
             _this[listName].splice(newIndex, 0, tpm[0]);
-          }
+          },
         });
       }
     },
@@ -551,6 +639,16 @@ export default {
       localStorage.setItem(listName + "Visible", this[listName + "Visible"]);
     },
     /**
+     * 折叠/展开一个项
+     */
+    foldItem(item) {
+      if (item.isFold === undefined) {
+        this.$set(item, "isFold", true);
+      } else {
+        item.isFold = !!!item.isFold;
+      }
+    },
+    /**
      * 从local恢复列表折叠状态
      */
     recoverFoldState(listName) {
@@ -580,7 +678,7 @@ export default {
           isTop: false, // 是否置顶
           createTime: new Date().getTime(),
           doneTime: -1,
-          delTime: -1
+          delTime: -1,
         };
 
         document
@@ -693,7 +791,7 @@ export default {
     delAllDoneItem() {
       let cf = confirm(`确认要将所有【已完成】项移到【已删除】吗？`);
       if (cf) {
-        this.doneList.forEach(v => {
+        this.doneList.forEach((v) => {
           v.delTime = new Date().getTime();
         });
         this.delList = Array.prototype.concat.apply(
@@ -721,7 +819,7 @@ export default {
 
       let today = new Date().getTime();
       let newList = [];
-      this.delList.forEach(v => {
+      this.delList.forEach((v) => {
         let diff = this.calDIffDay(v.delTime);
         // console.log("v.diff: ", diff);
         if (diff < this.delListAutoDelDay) {
@@ -782,14 +880,14 @@ export default {
           [],
           [
             _this[listName].slice(0, oldListTopCount),
-            data[listName].slice(0, importListTopCount)
+            data[listName].slice(0, importListTopCount),
           ]
         );
         let newUnTopList = Array.prototype.concat.apply(
           [],
           [
             _this[listName].slice(oldListTopCount),
-            data[listName].slice(importListTopCount)
+            data[listName].slice(importListTopCount),
           ]
         );
 
@@ -818,8 +916,8 @@ export default {
           [_this[listName], data[listName]]
         );
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -965,7 +1063,7 @@ $textColor2: #555;
     width: 90%;
   }
   .long-todo-list-box {
-    width: 70%;
+    width: 80%;
   }
 
   .todo-list-box,
@@ -1036,10 +1134,14 @@ $textColor2: #555;
             opacity: 1 !important;
           }
         }
+        &.is-fold {
+          height: 35px;
+          min-height: 0;
+          overflow: hidden;
+        }
         .check {
-          display: inline-block;
-          width: 7%;
-          // text-align: center;
+          margin-left: 2%;
+          margin-right: 2%;
           .inner {
             display: block;
             margin: 0 auto;
@@ -1048,9 +1150,7 @@ $textColor2: #555;
             height: 16px;
           }
         }
-        div.content {
-          display: inline-block;
-          width: 90%;
+        .content {
           min-height: 20px;
           letter-spacing: 0.6px;
           word-break: break-all;
@@ -1102,6 +1202,7 @@ $textColor2: #555;
     .long-todo-list {
       .items {
         background: #fff;
+
         &:hover {
           cursor: move;
         }
@@ -1111,30 +1212,52 @@ $textColor2: #555;
             cursor: default;
           }
         }
-        div.content {
-          cursor: pointer;
+
+        .line-1 {
+          display: flex;
+          justify-content: space-between;
+          .content {
+            flex-grow: 2; // 空间不足时分配更多剩余空间
+          }
+          .editor {
+          }
         }
-        .editor {
-          @include input-style;
-          width: 90%;
-          vertical-align: top;
+
+        .content {
+          cursor: pointer;
+          .editor {
+            @include input-style;
+            // width: 80%;
+            vertical-align: top;
+          }
+        }
+
+        .right-top-btn {
+          margin-right: 16px;
+          margin-left: 10px;
+          .icons {
+            font-size: 12px;
+            line-height: 12px;
+            color: #000;
+            opacity: 0.2;
+            transition: all 0.2s;
+            cursor: pointer;
+          }
         }
       }
     }
     .long-todo-list {
       .items {
         .check {
-          width: 8%;
-          padding: 0 1% 0 2%;
+          // width: 8%;
+          // padding: 0 1% 0 2%;
           .inner {
             width: 15px;
           }
         }
-        div.content {
-          width: 80%;
+        .content {
         }
         .editor {
-          width: 80%;
         }
         .collection {
           span.time {
@@ -1154,6 +1277,14 @@ $textColor2: #555;
       .items {
         background: #eaeaea;
         color: #848484;
+
+        .line-1 {
+          display: flex;
+          justify-content: space-between;
+          .content {
+            flex-grow: 2; // 空间不足时分配更多剩余空间
+          }
+        }
         .collection {
           .auto-del-hints {
             margin-left: 10px;
